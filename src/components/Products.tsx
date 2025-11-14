@@ -118,28 +118,7 @@ const Products: React.FC = () => {
 
         if (error) {
           console.error('Error fetching products:', error);
-          // Fallback to mock if error
-          setProducts([
-            {
-              id: '1',
-              title: 'iPhone 14 Pro Max',
-              price: 4500.00,
-              category: 'eletronicos',
-              condition: 'novo',
-              location: 'São Paulo',
-              images: [
-                'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop&crop=center',
-                'https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=400&h=300&fit=crop&crop=center',
-                'https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=400&h=300&fit=crop&crop=center'
-              ],
-              description: 'iPhone 14 Pro Max 256GB, câmera profissional, bateria duradoura. Como novo, com garantia Apple.',
-              created_at: new Date().toISOString(),
-              user_id: 'user1',
-              seller_name: 'João Silva',
-              seller_location: 'São Paulo',
-              is_active: true
-            }
-          ]);
+          setProducts([]);
         } else {
           // Mapear dados para incluir localização do perfil
           const mappedProducts = data?.map((product: any) => ({
