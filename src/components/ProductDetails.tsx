@@ -83,7 +83,23 @@ const ProductDetails: React.FC = () => {
 
   const loadConfig = async () => {
     try {
-      // Carregar da configuração global (sempre, para modo grid)
+      // Verificar se usuário está logado e carregar perfil
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData) {
+          setHeaderName(profileData.full_name || 'João Silva');
+          setHeaderLocation(profileData.location || 'Palmas-PR, São Francisco');
+          return;
+        }
+      }
+
+      // Caso contrário, carregar da configuração global
       const { data, error } = await supabase
         .from('app_config')
         .select('key, value');
