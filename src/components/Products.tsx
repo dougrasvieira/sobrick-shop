@@ -80,7 +80,7 @@ const Products: React.FC = () => {
           .from('products')
           .select(`
             *,
-            profiles!inner(location)
+            profiles!left(location)
           `)
           .eq('is_active', true)
           .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
@@ -103,7 +103,7 @@ const Products: React.FC = () => {
           .from('products')
           .select(`
             *,
-            profiles!inner(location)
+            profiles!left(location)
           `)
           .eq('is_active', true);
 
