@@ -91,7 +91,7 @@ const Products: React.FC = () => {
           setProducts([]);
         } else {
           // Mapear dados para incluir localização do perfil
-          const mappedProducts = data?.map(product => ({
+          const mappedProducts = data?.map((product: any) => ({
             ...product,
             seller_location: product.profiles?.location || product.location
           })) || [];
@@ -142,7 +142,7 @@ const Products: React.FC = () => {
           ]);
         } else {
           // Mapear dados para incluir localização do perfil
-          const mappedProducts = data?.map(product => ({
+          const mappedProducts = data?.map((product: any) => ({
             ...product,
             seller_location: product.profiles?.location || product.location
           })) || [];
