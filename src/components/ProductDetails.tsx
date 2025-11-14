@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // @ts-ignore
 import { supabase } from '../supabaseClient';
 
@@ -17,9 +17,7 @@ interface Product {
 const ProductDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const { productId } = location.state || {};
-  const seller = searchParams.get('seller');
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -85,19 +83,14 @@ const ProductDetails: React.FC = () => {
 
   const loadConfig = async () => {
     try {
-      const nameKey = seller ? `grid_header_name_${seller}` : 'grid_header_name';
-      const locationKey = seller ? `grid_header_location_${seller}` : 'grid_header_location';
-      const dbNameKey = seller ? `current_header_name_${seller}` : 'current_header_name';
-      const dbLocationKey = seller ? `current_header_location_${seller}` : 'current_header_location';
-
       // Primeiro tentar localStorage (para persistência imediata)
-      const savedName = localStorage.getItem(nameKey);
-      const savedLocation = localStorage.getItem(locationKey);
+      const savedName = localStorage.getItem('grid_header_name');
+      const savedLocation = localStorage.getItem('grid_header_location');
 
       if (savedName) {
         setHeaderName(savedName);
       } else {
-        // Carregar da configuração
+        // Carregar da configuração global
         const { data, error } = await supabase
           .from('app_config')
           .select('key, value');
@@ -106,13 +99,13 @@ const ProductDetails: React.FC = () => {
           acc[item.key] = item.value;
           return acc;
         }, {});
-        setHeaderName(config[dbNameKey] || (seller || 'João Silva'));
+        setHeaderName(config.current_header_name || 'João Silva');
       }
 
       if (savedLocation) {
         setHeaderLocation(savedLocation);
       } else {
-        // Carregar da configuração se não há localStorage
+        // Carregar da configuração global se não há localStorage
         const { data, error } = await supabase
           .from('app_config')
           .select('key, value');
@@ -121,7 +114,7 @@ const ProductDetails: React.FC = () => {
           acc[item.key] = item.value;
           return acc;
         }, {});
-        setHeaderLocation(config[dbLocationKey] || (seller ? 'Localização' : 'Palmas-PR, São Francisco'));
+        setHeaderLocation(config.current_header_location || 'Palmas-PR, São Francisco');
       }
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
@@ -130,17 +123,19 @@ const ProductDetails: React.FC = () => {
 
   const saveConfig = async (key: string, value: string) => {
     try {
-      const dbKey = seller ? `${key}_${seller}` : key;
       const { error } = await supabase
         .from('app_config')
-        .upsert({ key: dbKey, value }, { onConflict: 'key' });
+        .upsert({ key, value }, { onConflict: 'key' });
       if (error) throw error;
 
       // Salvar no localStorage também para persistência imediata
-      const storageKey = seller ? `${key.replace('current_', 'grid_')}_${seller}` : key.replace('current_', 'grid_');
-      localStorage.setItem(storageKey, value);
+      if (key === 'current_header_name') {
+        localStorage.setItem('grid_header_name', value);
+      } else if (key === 'current_header_location') {
+        localStorage.setItem('grid_header_location', value);
+      }
 
-      console.log(`Configuração salva: ${dbKey} = ${value}`);
+      console.log(`Configuração salva: ${key} = ${value}`);
     } catch (error) {
       console.error('Erro ao salvar configuração:', error);
     }
@@ -250,11 +245,9 @@ const ProductDetails: React.FC = () => {
       // Atualizar configurações do header se foram modificadas
       if (formData.header_name !== headerName) {
         setHeaderName(formData.header_name);
-        await saveConfig('current_header_name', formData.header_name);
       }
       if (formData.header_location !== headerLocation) {
         setHeaderLocation(formData.header_location);
-        await saveConfig('current_header_location', formData.header_location);
       }
 
       setFormData({
@@ -512,7 +505,7 @@ const ProductDetails: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                {products.filter(p => isAdmin || p.header_name === (seller || headerName)).map((prod) => (
+                {products.filter(p => isAdmin || p.header_name === headerName).map((prod) => (
                   <div
                     key={prod.id}
                     className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden h-52 relative cursor-pointer"
