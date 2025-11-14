@@ -83,39 +83,17 @@ const ProductDetails: React.FC = () => {
 
   const loadConfig = async () => {
     try {
-      // Primeiro tentar localStorage (para persistência imediata)
-      const savedName = localStorage.getItem('grid_header_name');
-      const savedLocation = localStorage.getItem('grid_header_location');
-
-      if (savedName) {
-        setHeaderName(savedName);
-      } else {
-        // Carregar da configuração global
-        const { data, error } = await supabase
-          .from('app_config')
-          .select('key, value');
-        if (error) throw error;
-        const config = data.reduce((acc: any, item: any) => {
-          acc[item.key] = item.value;
-          return acc;
-        }, {});
-        setHeaderName(config.current_header_name || 'João Silva');
-      }
-
-      if (savedLocation) {
-        setHeaderLocation(savedLocation);
-      } else {
-        // Carregar da configuração global se não há localStorage
-        const { data, error } = await supabase
-          .from('app_config')
-          .select('key, value');
-        if (error) throw error;
-        const config = data.reduce((acc: any, item: any) => {
-          acc[item.key] = item.value;
-          return acc;
-        }, {});
-        setHeaderLocation(config.current_header_location || 'Palmas-PR, São Francisco');
-      }
+      // Carregar da configuração global (sempre, para modo grid)
+      const { data, error } = await supabase
+        .from('app_config')
+        .select('key, value');
+      if (error) throw error;
+      const config = data.reduce((acc: any, item: any) => {
+        acc[item.key] = item.value;
+        return acc;
+      }, {});
+      setHeaderName(config.current_header_name || 'João Silva');
+      setHeaderLocation(config.current_header_location || 'Palmas-PR, São Francisco');
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
     }
@@ -127,14 +105,6 @@ const ProductDetails: React.FC = () => {
         .from('app_config')
         .upsert({ key, value }, { onConflict: 'key' });
       if (error) throw error;
-
-      // Salvar no localStorage também para persistência imediata
-      if (key === 'current_header_name') {
-        localStorage.setItem('grid_header_name', value);
-      } else if (key === 'current_header_location') {
-        localStorage.setItem('grid_header_location', value);
-      }
-
       console.log(`Configuração salva: ${key} = ${value}`);
     } catch (error) {
       console.error('Erro ao salvar configuração:', error);
@@ -427,12 +397,7 @@ const ProductDetails: React.FC = () => {
                   <input
                     type="text"
                     value={headerName}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setHeaderName(newValue);
-                      // Salvar no localStorage imediatamente para persistência
-                      localStorage.setItem('grid_header_name', newValue);
-                    }}
+                    onChange={(e) => setHeaderName(e.target.value)}
                     onBlur={(e) => product ? saveHeader('header_name', e.target.value) : saveConfig('current_header_name', e.target.value)}
                     className="text-lg font-bold text-gray-900 bg-transparent border-none outline-none text-center w-full"
                     placeholder="Nome do vendedor"
@@ -442,24 +407,7 @@ const ProductDetails: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <input
-                      type="text"
-                      value={headerLocation}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setHeaderLocation(newValue);
-                        // Salvar no localStorage imediatamente para persistência
-                        localStorage.setItem('grid_header_location', newValue);
-                      }}
-                      onBlur={(e) => product ? saveHeader('header_location', e.target.value) : saveConfig('current_header_location', e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          product ? saveHeader('header_location', e.currentTarget.value) : saveConfig('current_header_location', e.currentTarget.value);
-                        }
-                      }}
-                      className="text-sm font-semibold text-gray-500 bg-transparent border-none outline-none text-center"
-                      placeholder="Localização"
-                    />
+                    <p className="text-sm font-semibold text-gray-500">{headerLocation}</p>
                   </div>
                 </div>
               ) : (
