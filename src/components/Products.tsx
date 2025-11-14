@@ -78,7 +78,10 @@ const Products: React.FC = () => {
         // Busca no backend quando há termo de busca
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select(`
+            *,
+            profiles!inner(location)
+          `)
           .eq('is_active', true)
           .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
           .order('created_at', { ascending: false });
@@ -87,13 +90,21 @@ const Products: React.FC = () => {
           console.error('Error searching products:', error);
           setProducts([]);
         } else {
-          setProducts(data || []);
+          // Mapear dados para incluir localização do perfil
+          const mappedProducts = data?.map(product => ({
+            ...product,
+            seller_location: product.profiles?.location || product.location
+          })) || [];
+          setProducts(mappedProducts);
         }
       } else {
         // Busca normal quando não há termo de busca
         let query = supabase
           .from('products')
-          .select('*')
+          .select(`
+            *,
+            profiles!inner(location)
+          `)
           .eq('is_active', true);
 
         // Add category filter if selected
@@ -130,7 +141,12 @@ const Products: React.FC = () => {
             }
           ]);
         } else {
-          setProducts(data || []);
+          // Mapear dados para incluir localização do perfil
+          const mappedProducts = data?.map(product => ({
+            ...product,
+            seller_location: product.profiles?.location || product.location
+          })) || [];
+          setProducts(mappedProducts);
         }
       }
     } catch (error) {
@@ -696,7 +712,7 @@ const Products: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="text-xs text-gray-500 font-medium truncate">Palmas-PR, Bairro: São Francisco</span>
+                    <span className="text-xs text-gray-500 font-medium truncate">{product.seller_location || product.location || 'Localização não informada'}</span>
                   </div>
                 </div>
               </div>
