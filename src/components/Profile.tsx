@@ -190,7 +190,36 @@ const Profile: React.FC = () => {
             return;
           }
 
-          // 1. Remover produtos do usuário
+          // 1. Remover ratings/avaliações do usuário
+          const { error: ratingsError } = await supabase
+            .from('ratings')
+            .delete()
+            .eq('user_id', user.id);
+
+          if (ratingsError) {
+            console.error('Erro ao remover ratings:', ratingsError);
+          }
+
+          // 2. Remover chats onde o usuário é buyer ou seller
+          const { error: chatsBuyerError } = await supabase
+            .from('chats')
+            .delete()
+            .eq('buyer_id', user.id);
+
+          if (chatsBuyerError) {
+            console.error('Erro ao remover chats (buyer):', chatsBuyerError);
+          }
+
+          const { error: chatsSellerError } = await supabase
+            .from('chats')
+            .delete()
+            .eq('seller_id', user.id);
+
+          if (chatsSellerError) {
+            console.error('Erro ao remover chats (seller):', chatsSellerError);
+          }
+
+          // 3. Remover produtos do usuário
           const { error: productsError } = await supabase
             .from('products')
             .delete()
@@ -200,7 +229,7 @@ const Profile: React.FC = () => {
             console.error('Erro ao remover produtos:', productsError);
           }
 
-          // 2. Remover perfil do usuário
+          // 4. Remover perfil do usuário
           const { error: profileError } = await supabase
             .from('profiles')
             .delete()
@@ -210,7 +239,7 @@ const Profile: React.FC = () => {
             console.error('Erro ao remover perfil:', profileError);
           }
 
-          // 3. Remover da tabela admin_users se for admin
+          // 5. Remover da tabela admin_users se for admin
           const { error: adminError } = await supabase
             .from('admin_users')
             .delete()
@@ -220,7 +249,7 @@ const Profile: React.FC = () => {
             console.error('Erro ao remover admin:', adminError);
           }
 
-          // 4. Logout
+          // 6. Logout
           await supabase.auth.signOut();
 
           Swal.fire({
