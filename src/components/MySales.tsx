@@ -47,23 +47,19 @@ const MySales: React.FC = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           try {
-            // Verificar se há chats relacionados ao produto
-            const { data: relatedChats } = await supabase
-              .from('chats')
-              .select('id')
+            // Remover referências na tabela interests (favoritos/interesses)
+            await supabase
+              .from('interests')
+              .delete()
               .eq('product_id', productId);
 
-            if (relatedChats && relatedChats.length > 0) {
-              Swal.fire({
-                title: 'Não é possível remover',
-                text: 'Este produto tem conversas ativas. Remova as conversas primeiro.',
-                icon: 'error',
-                confirmButtonColor: '#57da74'
-              });
-              return;
-            }
+            // Remover chats relacionados ao produto
+            await supabase
+              .from('chats')
+              .delete()
+              .eq('product_id', productId);
 
-            // Fazer hard delete do produto
+            // Agora fazer hard delete do produto
             const { error } = await supabase
               .from('products')
               .delete()
@@ -74,7 +70,7 @@ const MySales: React.FC = () => {
               setMyProducts(prev => prev.filter(p => p.id !== productId));
               Swal.fire({
                 title: 'Removido!',
-                text: 'O produto foi permanentemente removido.',
+                text: 'O produto e todas as conversas relacionadas foram permanentemente removidos.',
                 icon: 'success',
                 confirmButtonColor: '#57da74'
               });
