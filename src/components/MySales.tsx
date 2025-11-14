@@ -35,29 +35,64 @@ const MySales: React.FC = () => {
   const removeProduct = async (productId: string) => {
     Swal.fire({
       title: 'Tem certeza?',
-      text: 'Esta ação não pode ser desfeita.',
+      text: 'Esta ação não pode ser desfeita. O produto será permanentemente removido.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sim, remover',
+      confirmButtonText: 'Sim, remover permanentemente',
       cancelButtonText: 'Cancelar'
     }).then(async (result) => {
       if (result.isConfirmed) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          const { error } = await supabase
-            .from('products')
-            .update({ is_active: false })
-            .eq('user_id', user.id)
-            .eq('id', productId);
+          try {
+            // Verificar se há chats relacionados ao produto
+            const { data: relatedChats } = await supabase
+              .from('chats')
+              .select('id')
+              .eq('product_id', productId);
 
-          if (!error) {
-            setMyProducts(prev => prev.filter(p => p.id !== productId));
+            if (relatedChats && relatedChats.length > 0) {
+              Swal.fire({
+                title: 'Não é possível remover',
+                text: 'Este produto tem conversas ativas. Remova as conversas primeiro.',
+                icon: 'error',
+                confirmButtonColor: '#57da74'
+              });
+              return;
+            }
+
+            // Fazer hard delete do produto
+            const { error } = await supabase
+              .from('products')
+              .delete()
+              .eq('user_id', user.id)
+              .eq('id', productId);
+
+            if (!error) {
+              setMyProducts(prev => prev.filter(p => p.id !== productId));
+              Swal.fire({
+                title: 'Removido!',
+                text: 'O produto foi permanentemente removido.',
+                icon: 'success',
+                confirmButtonColor: '#57da74'
+              });
+            } else {
+              console.error('Erro ao remover produto:', error);
+              Swal.fire({
+                title: 'Erro',
+                text: 'Não foi possível remover o produto.',
+                icon: 'error',
+                confirmButtonColor: '#57da74'
+              });
+            }
+          } catch (error) {
+            console.error('Erro ao remover produto:', error);
             Swal.fire({
-              title: 'Removido!',
-              text: 'O produto foi removido com sucesso.',
-              icon: 'success',
+              title: 'Erro',
+              text: 'Ocorreu um erro inesperado.',
+              icon: 'error',
               confirmButtonColor: '#57da74'
             });
           }
