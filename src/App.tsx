@@ -129,7 +129,7 @@ const ConditionalNav = () => {
     };
   }, [isLoggedIn]);
 
-  if (location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname === '/product-details' || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin') return null;
+  if (location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname.startsWith('/product-details') || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin') return null;
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
       <div className="flex justify-around items-center py-2">
@@ -171,6 +171,7 @@ function App() {
         <Route path="/" element={<Products />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product-details" element={<ProductDetails />} />
+        <Route path="/product-details/:slideId" element={<ProductDetails />} />
         <Route path="/product-details-grid" element={<ProductDetailsGrid />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/interests" element={<Interests />} />

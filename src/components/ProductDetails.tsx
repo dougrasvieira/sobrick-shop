@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 // @ts-ignore
 import { supabase } from '../supabaseClient';
 
@@ -17,6 +17,7 @@ interface Product {
 const ProductDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { slideId } = useParams<{ slideId?: string }>();
   const { productId } = location.state || {};
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,6 +84,22 @@ const ProductDetails: React.FC = () => {
 
   const loadConfig = async () => {
     try {
+      // Se temos slideId, carregar configurações específicas do slide
+      if (slideId) {
+        const { data, error } = await supabase
+          .from('app_config')
+          .select('key, value')
+          .in('key', [`slide${slideId}_header_name`, `slide${slideId}_header_location`]);
+        if (error) throw error;
+        const config = data.reduce((acc: any, item: any) => {
+          acc[item.key] = item.value;
+          return acc;
+        }, {});
+        setHeaderName(config[`slide${slideId}_header_name`] || `Vendedor ${slideId}`);
+        setHeaderLocation(config[`slide${slideId}_header_location`] || 'Localização');
+        return;
+      }
+
       // Verificar se usuário está logado e carregar perfil
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -213,7 +230,8 @@ const ProductDetails: React.FC = () => {
             order_position: 0,
             show_in_swiper: false,
             header_name: formData.header_name,
-            header_location: formData.header_location
+            header_location: formData.header_location,
+            slide_id: slideId ? parseInt(slideId) : 1
           });
 
         if (error) throw error;
@@ -370,12 +388,18 @@ const ProductDetails: React.FC = () => {
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('featured_products')
         .select('*')
         .eq('is_active', true)
-        .eq('show_in_swiper', false)
-        .order('created_at', { ascending: false });
+        .eq('show_in_swiper', false);
+
+      // Se temos slideId, filtrar por slide_id
+      if (slideId) {
+        query = query.eq('slide_id', parseInt(slideId));
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
       setProducts(data || []);

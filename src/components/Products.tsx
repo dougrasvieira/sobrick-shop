@@ -329,7 +329,7 @@ const Products: React.FC = () => {
             }}
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            {featuredProducts.map((product: any) => (
+            {featuredProducts.map((product: any, index: number) => (
               <SwiperSlide key={product.id}>
                 <div className="relative border border-gray-200 rounded-2xl overflow-hidden">
                   <img
@@ -354,7 +354,7 @@ const Products: React.FC = () => {
                   </div>
                   <button
                     className="absolute bottom-4 right-4 bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-                    onClick={() => navigate('/product-details')}
+                    onClick={() => navigate(`/product-details/${index + 1}`)}
                   >
                     Eu quero
                   </button>
