@@ -170,28 +170,76 @@ const Profile: React.FC = () => {
     });
   };
 
-  const handleDeactivateAccount = () => {
+  const handleDeactivateAccount = async () => {
     setShowSettingsModal(false);
     Swal.fire({
       title: 'Tem certeza?',
-      text: 'Sua conta será permanentemente desativada. Esta ação não pode ser desfeita.',
+      text: 'Sua conta será permanentemente desativada e TODOS os seus dados serão removidos. Esta ação não pode ser desfeita.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sim',
+      confirmButtonText: 'Sim, desativar conta',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Simulação de desativação - redireciona para login
-        Swal.fire({
-          title: 'Conta Desativada',
-          text: 'Sua conta foi desativada com sucesso.',
-          icon: 'success',
-          confirmButtonColor: '#57da74'
-        }).then(() => {
-          navigate('/login');
-        });
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) {
+            Swal.fire('Erro', 'Usuário não encontrado.', 'error');
+            return;
+          }
+
+          // 1. Remover produtos do usuário
+          const { error: productsError } = await supabase
+            .from('products')
+            .delete()
+            .eq('user_id', user.id);
+
+          if (productsError) {
+            console.error('Erro ao remover produtos:', productsError);
+          }
+
+          // 2. Remover perfil do usuário
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', user.id);
+
+          if (profileError) {
+            console.error('Erro ao remover perfil:', profileError);
+          }
+
+          // 3. Remover da tabela admin_users se for admin
+          const { error: adminError } = await supabase
+            .from('admin_users')
+            .delete()
+            .eq('user_id', user.id);
+
+          if (adminError) {
+            console.error('Erro ao remover admin:', adminError);
+          }
+
+          // 4. Logout
+          await supabase.auth.signOut();
+
+          Swal.fire({
+            title: 'Conta Desativada',
+            text: 'Sua conta e todos os dados foram removidos permanentemente.',
+            icon: 'success',
+            confirmButtonColor: '#57da74'
+          }).then(() => {
+            navigate('/login');
+          });
+
+        } catch (error) {
+          console.error('Erro ao desativar conta:', error);
+          Swal.fire({
+            title: 'Erro',
+            text: 'Não foi possível desativar a conta. Tente novamente.',
+            icon: 'error'
+          });
+        }
       }
     });
   };
