@@ -48,7 +48,7 @@ const Products: React.FC = () => {
       categoriesContainer.addEventListener('wheel', handleWheel);
       return () => categoriesContainer.removeEventListener('wheel', handleWheel);
     }
-  }, []);
+  }, [searchTerm, selectedCategory]);
 
   // Real-time updates for featured products
   useEffect(() => {
@@ -73,47 +73,65 @@ const Products: React.FC = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // Build query based on selected category
-      let query = supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true);
 
-      // Add category filter if selected
-      if (selectedCategory) {
-        query = query.eq('category', selectedCategory);
-      }
+      if (searchTerm.trim()) {
+        // Busca no backend quando há termo de busca
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
+          .order('created_at', { ascending: false });
 
-      query = query.order('created_at', { ascending: false });
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        // Fallback to mock if error
-        setProducts([
-          {
-            id: '1',
-            title: 'iPhone 14 Pro Max',
-            price: 4500.00,
-            category: 'eletronicos',
-            condition: 'novo',
-            location: 'São Paulo',
-            images: [
-              'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop&crop=center',
-              'https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=400&h=300&fit=crop&crop=center',
-              'https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=400&h=300&fit=crop&crop=center'
-            ],
-            description: 'iPhone 14 Pro Max 256GB, câmera profissional, bateria duradoura. Como novo, com garantia Apple.',
-            created_at: new Date().toISOString(),
-            user_id: 'user1',
-            seller_name: 'João Silva',
-            seller_location: 'São Paulo',
-            is_active: true
-          }
-        ]);
+        if (error) {
+          console.error('Error searching products:', error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
       } else {
-        setProducts(data || []);
+        // Busca normal quando não há termo de busca
+        let query = supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true);
+
+        // Add category filter if selected
+        if (selectedCategory) {
+          query = query.eq('category', selectedCategory);
+        }
+
+        query = query.order('created_at', { ascending: false });
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching products:', error);
+          // Fallback to mock if error
+          setProducts([
+            {
+              id: '1',
+              title: 'iPhone 14 Pro Max',
+              price: 4500.00,
+              category: 'eletronicos',
+              condition: 'novo',
+              location: 'São Paulo',
+              images: [
+                'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=400&h=300&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=400&h=300&fit=crop&crop=center'
+              ],
+              description: 'iPhone 14 Pro Max 256GB, câmera profissional, bateria duradoura. Como novo, com garantia Apple.',
+              created_at: new Date().toISOString(),
+              user_id: 'user1',
+              seller_name: 'João Silva',
+              seller_location: 'São Paulo',
+              is_active: true
+            }
+          ]);
+        } else {
+          setProducts(data || []);
+        }
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -220,29 +238,6 @@ const Products: React.FC = () => {
     }
   };
 
-  const filteredProducts = products.filter(product => {
-    if (!searchTerm.trim()) return true; // Se não há termo de busca, mostra todos
-
-    const searchLower = searchTerm.toLowerCase().trim();
-
-    // Busca por nome do produto
-    const matchesTitle = product.title.toLowerCase().includes(searchLower);
-
-    // Busca por descrição
-    const matchesDescription = product.description && product.description.toLowerCase().includes(searchLower);
-
-    // Busca por preço (converte para string e busca)
-    const matchesPrice = product.price.toString().includes(searchTerm) ||
-                        `R$ ${product.price.toLocaleString('pt-BR')}`.toLowerCase().includes(searchLower);
-
-    // Busca por categoria
-    const matchesCategory = product.category && product.category.toLowerCase().includes(searchLower);
-
-    // Busca por localização
-    const matchesLocation = product.location && product.location.toLowerCase().includes(searchLower);
-
-    return matchesTitle || matchesDescription || matchesPrice || matchesCategory || matchesLocation;
-  });
 
   return (
     <div className="min-h-screen bg-white pb-20" style={{ fontFamily: '"Outfit", sans-serif' }}>
@@ -659,14 +654,14 @@ const Products: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#57da74]"></div>
             <span className="ml-3 text-gray-600">Carregando produtos...</span>
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 text-lg">Nenhum produto encontrado.</p>
             <p className="text-gray-500 mt-2">Tente ajustar os filtros de busca.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-lg shadow-md overflow-hidden h-72 relative cursor-pointer"
