@@ -31,3 +31,4 @@ android/app/build/
 android/build/
 *.apk
 *.aab
+.vercel
