@@ -152,6 +152,13 @@ const ProductDetails: React.FC = () => {
         .update({ [field]: value })
         .eq('id', product.id);
       if (error) throw error;
+
+      // Se estamos em uma tela específica de slide, também salvar nas configurações
+      if (slideId) {
+        const configKey = field === 'header_name' ? `slide${slideId}_header_name` : `slide${slideId}_header_location`;
+        await saveConfig(configKey, value);
+      }
+
       // Update local state
       if (field === 'header_name') setHeaderName(value);
       else if (field === 'header_location') setHeaderLocation(value);
@@ -249,9 +256,15 @@ const ProductDetails: React.FC = () => {
       // Atualizar configurações do header se foram modificadas
       if (formData.header_name !== headerName) {
         setHeaderName(formData.header_name);
+        if (slideId) {
+          await saveConfig(`slide${slideId}_header_name`, formData.header_name);
+        }
       }
       if (formData.header_location !== headerLocation) {
         setHeaderLocation(formData.header_location);
+        if (slideId) {
+          await saveConfig(`slide${slideId}_header_location`, formData.header_location);
+        }
       }
 
       setFormData({
@@ -438,7 +451,17 @@ const ProductDetails: React.FC = () => {
                     type="text"
                     value={headerName}
                     onChange={(e) => setHeaderName(e.target.value)}
-                    onBlur={(e) => product ? saveHeader('header_name', e.target.value) : saveConfig('current_header_name', e.target.value)}
+                    onBlur={(e) => {
+                      const newValue = e.target.value;
+                      if (slideId) {
+                        saveConfig(`slide${slideId}_header_name`, newValue);
+                      } else if (product) {
+                        saveHeader('header_name', newValue);
+                      } else {
+                        saveConfig('current_header_name', newValue);
+                      }
+                      setHeaderName(newValue);
+                    }}
                     className="text-lg font-bold text-gray-900 bg-transparent border-none outline-none text-center w-full"
                     placeholder="Nome do vendedor"
                   />
@@ -447,7 +470,37 @@ const ProductDetails: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p className="text-sm font-semibold text-gray-500">{headerLocation}</p>
+                    <input
+                      type="text"
+                      value={headerLocation}
+                      onChange={(e) => setHeaderLocation(e.target.value)}
+                      onBlur={(e) => {
+                        const newValue = e.target.value;
+                        if (slideId) {
+                          saveConfig(`slide${slideId}_header_location`, newValue);
+                        } else if (product) {
+                          saveHeader('header_location', newValue);
+                        } else {
+                          saveConfig('current_header_location', newValue);
+                        }
+                        setHeaderLocation(newValue);
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const newValue = e.currentTarget.value;
+                          if (slideId) {
+                            saveConfig(`slide${slideId}_header_location`, newValue);
+                          } else if (product) {
+                            saveHeader('header_location', newValue);
+                          } else {
+                            saveConfig('current_header_location', newValue);
+                          }
+                          setHeaderLocation(newValue);
+                        }
+                      }}
+                      className="text-sm font-semibold text-gray-500 bg-transparent border-none outline-none text-center"
+                      placeholder="Localização"
+                    />
                   </div>
                 </div>
               ) : (
