@@ -129,7 +129,7 @@ const Products: React.FC = () => {
       console.log('Tentando buscar produtos em destaque...');
       const { data, error } = await supabase
         .from('featured_products')
-        .select('id, title, price, images, is_active, swiper_main_text, swiper_subtitle, swiper_price')
+        .select('id, title, price, images, is_active, swiper_main_text, swiper_subtitle, swiper_price, header_name')
         .eq('is_active', true)
         .eq('show_in_swiper', true)
         .order('order_position', { ascending: true })
@@ -354,7 +354,7 @@ const Products: React.FC = () => {
                   </div>
                   <button
                     className="absolute bottom-4 right-4 bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-                    onClick={() => navigate('/product-details')}
+                    onClick={() => navigate(`/product-details?seller=${product.header_name || 'João Silva'}`)}
                   >
                     Eu quero
                   </button>
