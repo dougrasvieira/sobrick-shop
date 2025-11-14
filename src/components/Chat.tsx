@@ -32,8 +32,10 @@ const Chat: React.FC = () => {
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [actualChatId, setActualChatId] = useState<string>(conversation.chatId);
   const [user, setUser] = useState<any>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadMessages = async () => {
     if (!conversation?.chatId || !user) return;
@@ -202,6 +204,97 @@ const Chat: React.FC = () => {
       console.error('Erro ao enviar mensagem:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !conversation?.chatId || !user) return;
+
+    // Validar tamanho (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('A imagem deve ter no máximo 2MB');
+      return;
+    }
+
+    // Validar tipo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione apenas arquivos de imagem');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      // Upload para Supabase Storage
+      const fileName = `chat-images/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('chat-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Erro ao fazer upload:', uploadError);
+        alert('Erro ao enviar imagem. Tente novamente.');
+        return;
+      }
+
+      // Gerar URL pública
+      const { data: urlData } = supabase.storage
+        .from('chat-images')
+        .getPublicUrl(fileName);
+
+      if (!urlData?.publicUrl) {
+        alert('Erro ao obter URL da imagem');
+        return;
+      }
+
+      // Atualizar last_seen do usuário atual
+      await supabase
+        .from('profiles')
+        .update({ last_seen: new Date().toISOString() })
+        .eq('id', user.id);
+
+      // Criar mensagem com imagem
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        content: `[Imagem] ${urlData.publicUrl}`,
+        sender_id: user.id,
+        created_at: new Date().toISOString(),
+        is_read: false
+      };
+
+      // Buscar chat atual
+      let { data: chat } = await supabase
+        .from('chats')
+        .select('messages')
+        .eq('id', actualChatId)
+        .single();
+
+      if (!chat) {
+        // Tentar criar o chat se não existir
+        chat = await createChatIfNotExists();
+      }
+
+      const updatedMessages = [...(chat.messages || []), newMessage];
+
+      // Atualizar chat
+      await supabase
+        .from('chats')
+        .update({
+          messages: updatedMessages,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', actualChatId);
+
+      setMessages(updatedMessages);
+    } catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+      alert('Erro ao enviar imagem. Tente novamente.');
+    } finally {
+      setUploadingImage(false);
+      // Limpar input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -551,6 +644,15 @@ const Chat: React.FC = () => {
                             </button>
                           </div>
                         </div>
+                      ) : msg.content.startsWith('[Imagem] ') ? (
+                        <div>
+                          <img
+                            src={msg.content.replace('[Imagem] ', '')}
+                            alt="Imagem enviada"
+                            className="max-w-full rounded-lg cursor-pointer"
+                            onClick={() => window.open(msg.content.replace('[Imagem] ', ''), '_blank')}
+                          />
+                        </div>
                       ) : (
                         <p className="text-sm">{msg.content}</p>
                       )}
@@ -564,7 +666,18 @@ const Chat: React.FC = () => {
                   </div>
                 ) : (
                   <div className={`max-w-xs px-4 py-2 rounded-lg bg-gray-100 text-black rounded-bl-none`}>
-                    <p className="text-sm">{msg.content}</p>
+                    {msg.content.startsWith('[Imagem] ') ? (
+                      <div>
+                        <img
+                          src={msg.content.replace('[Imagem] ', '')}
+                          alt="Imagem enviada"
+                          className="max-w-full rounded-lg cursor-pointer"
+                          onClick={() => window.open(msg.content.replace('[Imagem] ', ''), '_blank')}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-sm">{msg.content}</p>
+                    )}
                     <p className="text-xs mt-1 text-gray-500">
                       {new Date(msg.created_at).toLocaleTimeString('pt-BR', {
                         hour: '2-digit',
@@ -652,13 +765,26 @@ const Chat: React.FC = () => {
             </div>
           )}
           <div className="flex items-center space-x-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
             <button
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
-              aria-label="Anexar"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingImage}
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+              aria-label="Enviar imagem"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
+              {uploadingImage ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              )}
             </button>
             <div className="flex-1 relative">
               <input

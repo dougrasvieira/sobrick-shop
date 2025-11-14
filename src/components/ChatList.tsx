@@ -246,10 +246,8 @@ const ChatList: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="flex-1 text-center text-xl font-black">
-              <span className="text-black font-black">Chat </span>
-              <span className="text-[#57da74] font-black" style={{ WebkitTextStroke: '1px black' }}>Só</span>
-              <span className="text-black font-black">Brick</span>
+            <h1 className="flex-1 text-center text-xl font-black" translate="no">
+              Chat SóBrick
             </h1>
           </div>
         </div>
