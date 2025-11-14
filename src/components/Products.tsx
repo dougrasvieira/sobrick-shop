@@ -253,7 +253,7 @@ const Products: React.FC = () => {
             <div className="inline-flex items-center space-x-0 mb-1 rounded-lg px-0.5 py-0.5">
               <img src="/logotipo.png" alt="Logo SóBrick" className="h-12 w-auto cursor-pointer" style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))' }} onClick={() => window.location.reload()} />
               <div className="flex flex-col items-center -mt-1">
-                <h1 className="text-2xl font-black text-gray-900">
+                <h1 className="text-2xl font-black text-gray-900" translate="no">
                   <span className="text-[#57da74]" style={{ WebkitTextStroke: '1px black' }}>Só</span><span className="text-black">Brick</span>
                 </h1>
                 <p className="text-white text-xs font-light italic -mt-1" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
