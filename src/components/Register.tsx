@@ -78,7 +78,9 @@ const Register: React.FC = () => {
             location: formData.location,
             phone: formData.phone,
           },
-          emailRedirectTo: 'http://localhost:5173/login'
+          emailRedirectTo: import.meta.env.DEV
+            ? 'http://localhost:5173/login'
+            : 'https://www.sobrick.shop/login'
         }
       });
 
