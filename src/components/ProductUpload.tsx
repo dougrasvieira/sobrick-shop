@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 import Swal from 'sweetalert2';
 

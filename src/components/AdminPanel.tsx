@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 interface FeaturedProduct {

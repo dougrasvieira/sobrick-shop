@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 const Profile: React.FC = () => {
@@ -219,7 +218,7 @@ const Profile: React.FC = () => {
 
             if (products) {
               const filesToDelete: string[] = [];
-              products.forEach((product: any) => {
+              products.forEach((product: { images: string[] }) => {
                 if (product.images && Array.isArray(product.images)) {
                   product.images.forEach((imageUrl: string) => {
                     try {
@@ -279,6 +278,16 @@ const Profile: React.FC = () => {
 
           if (productsError) {
             console.error('Erro ao remover produtos:', productsError);
+          }
+
+          // 3.5. Remover interesses do usuário
+          const { error: interestsError } = await supabase
+            .from('interests')
+            .delete()
+            .eq('user_id', user.id);
+
+          if (interestsError) {
+            console.error('Erro ao remover interesses:', interestsError);
           }
 
           // 4. Remover perfil do usuário

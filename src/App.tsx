@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Products from './components/Products';
 import ProductDetails from './components/ProductDetails';
 import ProductDetailsGrid from './components/ProductDetailsGrid';
@@ -12,7 +12,6 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ProductUpload from './components/ProductUpload';
 import AdminPanel from './components/AdminPanel';
-// @ts-ignore
 import { supabase } from './supabaseClient';
 import './App.css';
 
@@ -22,7 +21,7 @@ const ConditionalNav = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const fetchUnreadMessages = async (userId: string) => {
+  const fetchUnreadMessages = useCallback(async (userId: string) => {
     try {
       // Query otimizada - buscar apenas campos necessários
       const { data: chats, error } = await supabase
@@ -42,7 +41,7 @@ const ConditionalNav = () => {
         for (const chat of chats) {
           if (chat.messages && Array.isArray(chat.messages)) {
             // Contar apenas mensagens não lidas que não são do usuário
-            const unreadMessages = chat.messages.filter((msg: any) =>
+            const unreadMessages = chat.messages.filter((msg: { sender_id: string; is_read: boolean }) =>
               msg.sender_id !== userId && !msg.is_read
             );
             totalUnread += unreadMessages.length;
@@ -56,7 +55,7 @@ const ConditionalNav = () => {
       console.warn('Erro ao contar mensagens não lidas:', error);
       // Manter valor anterior em caso de erro
     }
-  };
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,7 +89,7 @@ const ConditionalNav = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchUnreadMessages]);
 
   // Atualizar contagem quando acessar página de mensagens
   useEffect(() => {

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -24,6 +23,16 @@ interface Product {
   is_active: boolean;
 }
 
+interface FeaturedProduct {
+  id: string;
+  title: string;
+  price: number;
+  images: string[];
+  swiper_main_text?: string;
+  swiper_subtitle?: string;
+  swiper_price?: string;
+}
+
 const Products: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,95 +41,9 @@ const Products: React.FC = () => {
   const navigate = useNavigate();
 
   // Estado para produtos em destaque (carregados do banco)
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
 
-  useEffect(() => {
-    fetchProducts();
-    fetchFeaturedProducts();
-
-    // Enable horizontal scroll with mouse wheel for categories
-    const categoriesContainer = document.querySelector('.categories-container') as HTMLElement;
-    if (categoriesContainer) {
-      const handleWheel = (e: WheelEvent) => {
-        e.preventDefault();
-        categoriesContainer.scrollLeft += e.deltaY;
-      };
-      categoriesContainer.addEventListener('wheel', handleWheel);
-      return () => categoriesContainer.removeEventListener('wheel', handleWheel);
-    }
-  }, [searchTerm, selectedCategory]);
-
-  // Real-time updates for featured products
-  useEffect(() => {
-    const channel = supabase
-      .channel('featured-products-realtime')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'featured_products'
-      }, (payload: RealtimePostgresChangesPayload<any>) => {
-        console.log('Realtime update:', payload);
-        fetchFeaturedProducts();
-      })
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
-
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-
-      if (searchTerm.trim()) {
-        // Busca no backend quando há termo de busca
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('is_active', true)
-          .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error searching products:', error);
-          setProducts([]);
-        } else {
-          setProducts(data || []);
-        }
-      } else {
-        // Busca normal quando não há termo de busca
-        let query = supabase
-          .from('products')
-          .select('*')
-          .eq('is_active', true);
-
-        // Add category filter if selected
-        if (selectedCategory) {
-          query = query.eq('category', selectedCategory);
-        }
-
-        query = query.order('created_at', { ascending: false });
-
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('Error fetching products:', error);
-          setProducts([]);
-        } else {
-          setProducts(data || []);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFeaturedProducts = async () => {
+  const fetchFeaturedProducts = useCallback(async () => {
     try {
       // Buscar produtos em destaque com configurações específicas do swiper
       console.log('Tentando buscar produtos em destaque...');
@@ -215,8 +138,93 @@ const Products: React.FC = () => {
         }
       ]);
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    fetchProducts();
+    fetchFeaturedProducts();
+
+    // Enable horizontal scroll with mouse wheel for categories
+    const categoriesContainer = document.querySelector('.categories-container') as HTMLElement;
+    if (categoriesContainer) {
+      const handleWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        categoriesContainer.scrollLeft += e.deltaY;
+      };
+      categoriesContainer.addEventListener('wheel', handleWheel);
+      return () => categoriesContainer.removeEventListener('wheel', handleWheel);
+    }
+  }, [searchTerm, selectedCategory]);
+
+  // Real-time updates for featured products
+  useEffect(() => {
+    const channel = supabase
+      .channel('featured-products-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'featured_products'
+      }, (payload: RealtimePostgresChangesPayload<any>) => {
+        console.log('Realtime update:', payload);
+        fetchFeaturedProducts();
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [fetchFeaturedProducts]);
+
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      if (searchTerm.trim()) {
+        // Busca no backend quando há termo de busca
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error searching products:', error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+      } else {
+        // Busca normal quando não há termo de busca
+        let query = supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true);
+
+        // Add category filter if selected
+        if (selectedCategory) {
+          query = query.eq('category', selectedCategory);
+        }
+
+        query = query.order('created_at', { ascending: false });
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching products:', error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-white pb-20" style={{ fontFamily: '"Outfit", sans-serif' }}>
@@ -303,7 +311,7 @@ const Products: React.FC = () => {
             }}
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            {featuredProducts.map((product: any, index: number) => (
+            {featuredProducts.map((product: FeaturedProduct, index: number) => (
               <SwiperSlide key={product.id}>
                 <div className="relative border border-gray-200 rounded-2xl overflow-hidden">
                   <img
@@ -313,17 +321,17 @@ const Products: React.FC = () => {
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                      {(product as any).swiper_main_text && (product as any).swiper_main_text.trim() !== '' ? (product as any).swiper_main_text : ''}
+                      {product.swiper_main_text && product.swiper_main_text.trim() !== '' ? product.swiper_main_text : ''}
                     </span>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 text-white p-4 rounded-b-lg">
-                    {(product as any).swiper_subtitle && (
+                    {product.swiper_subtitle && (
                       <h2 className="text-xl font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                        {(product as any).swiper_subtitle}
+                        {product.swiper_subtitle}
                       </h2>
                     )}
                     <p className="text-lg font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                      {(product as any).swiper_price || `R$ ${product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      {product.swiper_price || `R$ ${product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     </p>
                   </div>
                   <button

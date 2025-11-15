@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 interface Conversation {
@@ -24,6 +23,8 @@ const ChatList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const chatChannelRef = useRef<any>(null);
+  const profileChannelRef = useRef<any>(null);
 
   const handleDeleteChat = async (chatId: string) => {
     try {
@@ -193,11 +194,18 @@ const ChatList: React.FC = () => {
             payload.old?.buyer_id === user.id || payload.old?.seller_id === user.id) {
           loadConversations();
         }
-      })
-      .subscribe();
+      });
 
-    return () => chatChannel.unsubscribe();
-  }, []);
+    chatChannelRef.current = chatChannel;
+    chatChannel.subscribe();
+
+    return () => {
+      if (chatChannelRef.current) {
+        chatChannelRef.current.unsubscribe();
+        chatChannelRef.current = null;
+      }
+    };
+  }, [user]);
 
   // Real-time updates for user status
   useEffect(() => {
@@ -212,10 +220,17 @@ const ChatList: React.FC = () => {
           }
           return conv;
         }));
-      })
-      .subscribe();
+      });
 
-    return () => profileChannel.unsubscribe();
+    profileChannelRef.current = profileChannel;
+    profileChannel.subscribe();
+
+    return () => {
+      if (profileChannelRef.current) {
+        profileChannelRef.current.unsubscribe();
+        profileChannelRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {

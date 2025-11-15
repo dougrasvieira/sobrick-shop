@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 const Register: React.FC = () => {
@@ -92,6 +91,8 @@ const Register: React.FC = () => {
           message = 'A senha deve ter pelo menos 6 caracteres.';
         } else if (error.message?.includes('429') || error.status === 429) {
           message = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
+        } else if (error.status === 500) {
+          message = 'Erro interno do servidor. Verifique as configurações de redirecionamento no painel do Supabase.';
         }
         setError(message);
       } else {
@@ -108,6 +109,8 @@ const Register: React.FC = () => {
       let message = 'Erro ao cadastrar. Tente novamente.';
       if (err.message?.includes('429') || err.status === 429) {
         message = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
+      } else if (err.status === 500) {
+        message = 'Erro interno do servidor. Verifique as configurações de redirecionamento no painel do Supabase.';
       }
       setError(message);
     } finally {

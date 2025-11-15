@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 const MySales: React.FC = () => {

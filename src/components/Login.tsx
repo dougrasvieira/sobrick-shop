@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 const Login: React.FC = () => {
@@ -27,6 +26,10 @@ const Login: React.FC = () => {
           message = 'Login inválido. Verifique e-mail e senha.';
         } else if (error.message.includes('Email not confirmed')) {
           message = 'E-mail não confirmado. Verifique sua caixa de entrada.';
+        } else if (error.status === 400) {
+          message = 'Dados de login inválidos. Verifique e-mail e senha.';
+        } else if (error.status === 500) {
+          message = 'Erro interno do servidor. Tente novamente mais tarde.';
         }
         setError(message);
       } else {
@@ -49,8 +52,15 @@ const Login: React.FC = () => {
         }
         navigate('/');
       }
-    } catch (err) {
-      setError('Erro ao fazer login. Tente novamente.');
+    } catch (err: unknown) {
+      let message = 'Erro ao fazer login. Tente novamente.';
+      const error = err as { status?: number; message?: string };
+      if (error.status === 400) {
+        message = 'Dados de login inválidos. Verifique e-mail e senha.';
+      } else if (error.status === 500) {
+        message = 'Erro interno do servidor. Tente novamente mais tarde.';
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }

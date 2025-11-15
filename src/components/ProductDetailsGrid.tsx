@@ -7,7 +7,6 @@ import React, { useState } from 'react';
   import 'swiper/css/navigation';
   import 'swiper/css/pagination';
   import Swal from 'sweetalert2';
-  // @ts-ignore
   import { supabase } from '../supabaseClient';
 
 
@@ -62,7 +61,7 @@ const ProductDetailsGrid: React.FC = () => {
             .select('*')
             .eq('user_id', user.id)
             .eq('product_id', product.id);
-          setIsFavorite(data && data.length > 0);
+          setIsFavorite(data ? data.length > 0 : false);
         }
       };
       if (product) checkFavorite();

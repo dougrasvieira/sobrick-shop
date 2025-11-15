@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import EmojiPicker, { Categories } from 'emoji-picker-react';
 import UserInfo from './UserInfo';
-// @ts-ignore
 import { supabase } from '../supabaseClient';
 
 interface ChatMessage {
@@ -11,6 +10,21 @@ interface ChatMessage {
   sender_id: string;
   created_at: string;
   is_read: boolean;
+}
+
+interface UserProfile {
+  id?: string;
+  full_name: string;
+  avatar_url: string;
+  last_seen?: string;
+}
+
+interface OtherUserProfile {
+  id: string;
+  name: string;
+  avatar_url: string;
+  is_online: boolean;
+  last_seen?: string;
 }
 
 const Chat: React.FC = () => {
@@ -27,15 +41,16 @@ const Chat: React.FC = () => {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
+  const [otherUserProfile, setOtherUserProfile] = useState<OtherUserProfile | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(null);
   const [actualChatId, setActualChatId] = useState<string>(conversation.chatId);
   const [user, setUser] = useState<any>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const channelRef = useRef<any>(null);
 
   const loadMessages = async () => {
     if (!conversation?.chatId || !user) return;
@@ -110,13 +125,13 @@ const Chat: React.FC = () => {
       });
 
       // Marcar mensagens recebidas como lidas
-      const updatedMessages = (chat.messages || []).map((msg: ChatMessage) => ({
-        ...msg,
-        is_read: msg.sender_id !== user.id ? true : msg.is_read
-      }));
+       const updatedMessages = (chat?.messages || []).map((msg: ChatMessage) => ({
+         ...msg,
+         is_read: msg.sender_id !== user.id ? true : msg.is_read
+       }));
 
-      // Atualizar no banco se houver mudanças
-      if (JSON.stringify(chat.messages) !== JSON.stringify(updatedMessages)) {
+       // Atualizar no banco se houver mudanças
+       if (JSON.stringify(chat?.messages) !== JSON.stringify(updatedMessages)) {
         await supabase
           .from('chats')
           .update({ messages: updatedMessages })
@@ -187,7 +202,7 @@ const Chat: React.FC = () => {
         chat = await createChatIfNotExists();
       }
 
-      const updatedMessages = [...(chat.messages || []), newMessage];
+      const updatedMessages = [...(chat?.messages || []), newMessage];
 
       // Atualizar chat
       await supabase
@@ -274,7 +289,7 @@ const Chat: React.FC = () => {
         chat = await createChatIfNotExists();
       }
 
-      const updatedMessages = [...(chat.messages || []), newMessage];
+      const updatedMessages = [...(chat?.messages || []), newMessage];
 
       // Atualizar chat
       await supabase
@@ -432,7 +447,9 @@ const Chat: React.FC = () => {
       setUser(session?.user || null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      void subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -454,10 +471,17 @@ const Chat: React.FC = () => {
       .channel('chat-updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chats', filter: `id=eq.${actualChatId}` }, (payload: any) => {
         setMessages(payload.new.messages);
-      })
-      .subscribe();
+      });
 
-    return () => channel.unsubscribe();
+    channelRef.current = channel;
+    channel.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
+    };
   }, [actualChatId]);
 
 
@@ -504,7 +528,7 @@ const Chat: React.FC = () => {
             <UserInfo
               avatar={otherUserProfile?.avatar_url || conversation.avatar}
               name={otherUserProfile?.name || conversation.name}
-              isOnline={otherUserProfile?.last_seen && (Date.now() - new Date(otherUserProfile.last_seen).getTime()) < 5 * 60 * 1000}
+              isOnline={otherUserProfile?.is_online}
               lastSeen={otherUserProfile?.last_seen}
             />
             <div className="relative">
