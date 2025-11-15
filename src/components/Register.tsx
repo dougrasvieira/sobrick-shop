@@ -95,9 +95,10 @@ const Register: React.FC = () => {
         }
         setError(message);
       } else {
+        // Quando confirmação está desabilitada, o usuário é criado imediatamente
         Swal.fire({
           title: 'Sucesso!',
-          text: 'Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.',
+          text: 'Cadastro realizado com sucesso! Você já pode fazer login.',
           icon: 'success',
           confirmButtonColor: '#57da74'
         }).then(() => {
