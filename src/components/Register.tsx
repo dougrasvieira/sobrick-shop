@@ -95,15 +95,14 @@ const Register: React.FC = () => {
         }
         setError(message);
       } else {
-        // Quando confirmação está desabilitada, o usuário é criado imediatamente
+        // Quando confirmação de email está habilitada, o usuário precisa confirmar o email
         Swal.fire({
           title: 'Sucesso!',
-          text: 'Cadastro realizado com sucesso! Você já pode fazer login.',
+          text: 'Cadastro realizado! Verifique seu email para confirmar a conta antes de fazer login.',
           icon: 'success',
           confirmButtonColor: '#57da74'
-        }).then(() => {
-          navigate('/login');
         });
+        // Não navega automaticamente para login
       }
     } catch (err: any) {
       let message = 'Erro ao cadastrar. Tente novamente.';
