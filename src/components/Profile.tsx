@@ -190,6 +190,58 @@ const Profile: React.FC = () => {
             return;
           }
 
+          // 0. Remover arquivos do storage antes de deletar registros
+
+          // Remover avatar
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('avatar_url')
+              .eq('id', user.id)
+              .single();
+
+            if (profile?.avatar_url && !profile.avatar_url.includes('ui-avatars.com')) {
+              const url = new URL(profile.avatar_url);
+              const pathParts = url.pathname.split('/');
+              const filename = pathParts[pathParts.length - 1];
+              await supabase.storage.from('avatars').remove([filename]);
+            }
+          } catch (error) {
+            console.error('Erro ao remover avatar:', error);
+          }
+
+          // Remover imagens de produtos
+          try {
+            const { data: products } = await supabase
+              .from('products')
+              .select('images')
+              .eq('user_id', user.id);
+
+            if (products) {
+              const filesToDelete: string[] = [];
+              products.forEach((product: any) => {
+                if (product.images && Array.isArray(product.images)) {
+                  product.images.forEach((imageUrl: string) => {
+                    try {
+                      const url = new URL(imageUrl);
+                      const pathParts = url.pathname.split('/');
+                      const filename = pathParts[pathParts.length - 1];
+                      filesToDelete.push(filename);
+                    } catch (error) {
+                      console.error('Erro ao processar URL da imagem:', error);
+                    }
+                  });
+                }
+              });
+
+              if (filesToDelete.length > 0) {
+                await supabase.storage.from('product-images').remove(filesToDelete);
+              }
+            }
+          } catch (error) {
+            console.error('Erro ao remover imagens de produtos:', error);
+          }
+
           // 1. Remover ratings/avaliações do usuário
           const { error: ratingsError } = await supabase
             .from('ratings')

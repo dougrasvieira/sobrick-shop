@@ -30,6 +30,23 @@ const Login: React.FC = () => {
         }
         setError(message);
       } else {
+        // Verificar se o perfil existe (conta não foi desativada)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError || !profile) {
+            // Conta foi desativada ou perfil não existe
+            await supabase.auth.signOut();
+            setError('Esta conta foi desativada e não pode mais ser acessada.');
+            setLoading(false);
+            return;
+          }
+        }
         navigate('/');
       }
     } catch (err) {
