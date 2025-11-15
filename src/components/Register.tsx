@@ -79,7 +79,7 @@ const Register: React.FC = () => {
           },
           emailRedirectTo: import.meta.env.DEV
             ? 'http://localhost:5173/login'
-            : 'https://sobrick.shop/login'
+            : 'https://www.sobrick.shop/login'
         }
       });
 
