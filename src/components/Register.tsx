@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 // @ts-ignore
@@ -18,6 +18,16 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [lastAttempt, setLastAttempt] = useState<number>(0);
+  const [cooldown, setCooldown] = useState<number>(0);
+
+  // Countdown para cooldown
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,8 +53,20 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Rate limiting: verificar se passou 60 segundos da última tentativa
+    const now = Date.now();
+    const timeSinceLastAttempt = now - lastAttempt;
+
+    if (timeSinceLastAttempt < 60000) {
+      const remaining = Math.ceil((60000 - timeSinceLastAttempt) / 1000);
+      setError(`Aguarde ${remaining} segundos antes de tentar novamente.`);
+      setCooldown(remaining);
+      return;
+    }
+
     setLoading(true);
     setError('');
+    setLastAttempt(now);
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -66,6 +88,8 @@ const Register: React.FC = () => {
           message = 'Usuário já cadastrado. Tente fazer login.';
         } else if (error.message.includes('Password should be at least')) {
           message = 'A senha deve ter pelo menos 6 caracteres.';
+        } else if (error.message?.includes('429') || error.status === 429) {
+          message = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
         }
         setError(message);
       } else {
@@ -78,8 +102,12 @@ const Register: React.FC = () => {
           navigate('/login');
         });
       }
-    } catch (err) {
-      setError('Erro ao cadastrar. Tente novamente.');
+    } catch (err: any) {
+      let message = 'Erro ao cadastrar. Tente novamente.';
+      if (err.message?.includes('429') || err.status === 429) {
+        message = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -239,12 +267,18 @@ const Register: React.FC = () => {
               </div>
             )}
 
+            {cooldown > 0 && (
+              <div className="text-yellow-400 text-sm text-center mb-4">
+                Próxima tentativa em: {cooldown} segundos
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || cooldown > 0}
               className="w-full bg-[#57da74] text-black py-3 px-4 rounded-full font-semibold hover:bg-[#4bc864] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#57da74] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {loading ? 'Criando conta...' : 'Criar conta'}
+              {loading ? 'Criando conta...' : cooldown > 0 ? `Aguarde ${cooldown}s` : 'Criar conta'}
             </button>
           </form>
 
