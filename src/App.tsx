@@ -12,6 +12,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ProductUpload from './components/ProductUpload';
 import AdminPanel from './components/AdminPanel';
+import DownloadApk from './components/DownloadApk';
 import { supabase } from './supabaseClient';
 import './App.css';
 
@@ -128,7 +129,7 @@ const ConditionalNav = () => {
     };
   }, [isLoggedIn]);
 
-  if (location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname.startsWith('/product-details') || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin') return null;
+  if (location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname.startsWith('/product-details') || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin' || location.pathname === '/download') return null;
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
       <div className="flex justify-around items-center py-2">
@@ -179,6 +180,7 @@ function App() {
         <Route path="/chat/:id" element={<Chat />} />
         <Route path="/upload-product" element={<ProductUpload />} />
         <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/download" element={<DownloadApk />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
