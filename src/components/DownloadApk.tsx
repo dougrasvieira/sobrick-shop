@@ -21,7 +21,7 @@ const DownloadApk: React.FC = () => {
               Tenha acesso a todos os produtos e anúncios diretamente no seu celular. Baixe agora e faça ótimos negócios!
             </p>
             <a
-              href="https://drive.google.com/file/d/1Rt_pcpvSNArkKFcCUOEP0SFmCMPM0cVF/view?usp=drive_link"
+              href="https://drive.google.com/file/d/1KI0fIeWc2Q8-ioDxTdNhkquCZBG10R2E/view?usp=drive_link"
               download="sobrick.apk"
               className="inline-flex items-center px-6 py-3 bg-white text-[#57da74] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
             >
