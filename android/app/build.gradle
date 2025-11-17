@@ -20,14 +20,14 @@ android {
         release {
             storeFile file('my-release-key.jks')
             storePassword 'Douglas22%'
-            keyAlias 'my-alias'
+            keyAlias 'my-key-alias'
             keyPassword 'Douglas22%'
         }
     }
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

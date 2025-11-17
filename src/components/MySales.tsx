@@ -135,7 +135,7 @@ const MySales: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
             {myProducts.map((product) => (
-              <div key={product.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div key={product.id} onClick={() => navigate('/product-details-grid', { state: { productId: product.id } })} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                 <div className="aspect-square relative">
                   <img
                     src={
