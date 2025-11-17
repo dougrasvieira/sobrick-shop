@@ -32,4 +32,5 @@ android/build/
 *.apk
 *.aab
 *.jks
+*.keystore
 .vercel

@@ -5,7 +5,16 @@ const config: CapacitorConfig = {
   appName: 'SóBrick',
   webDir: 'dist',
   // @ts-ignore
-  icon: 'resources/icone.png'
+  icon: 'resources/icone.png',
+  android: {
+    // @ts-ignore
+    signing: {
+      path: 'android/my-release-key.keystore',
+      alias: 'alias_name',
+      storePassword: 'Douglas22%',
+      keyPassword: 'Douglas22%'
+    }
+  }
 };
 
 export default config;
