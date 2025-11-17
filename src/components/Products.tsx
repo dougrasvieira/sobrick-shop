@@ -43,6 +43,10 @@ const Products: React.FC = () => {
   // Estado para produtos em destaque (carregados do banco)
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
 
+  // Estados para navegação no header
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const fetchFeaturedProducts = useCallback(async () => {
     try {
       // Buscar produtos em destaque com configurações específicas do swiper
@@ -140,6 +144,42 @@ const Products: React.FC = () => {
     }
   }, []);
 
+  const fetchUnreadMessages = useCallback(async (userId: string) => {
+    try {
+      // Query otimizada - buscar apenas campos necessários
+      const { data: chats, error } = await supabase
+        .from('chats')
+        .select('messages')
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
+        .limit(20); // Limitar para performance
+
+      if (error) {
+        console.warn('Erro ao buscar mensagens não lidas:', error);
+        return;
+      }
+
+      let totalUnread = 0;
+
+      if (chats) {
+        for (const chat of chats) {
+          if (chat.messages && Array.isArray(chat.messages)) {
+            // Contar apenas mensagens não lidas que não são do usuário
+            const unreadMessages = chat.messages.filter((msg: { sender_id: string; is_read: boolean }) =>
+              msg.sender_id !== userId && !msg.is_read
+            );
+            totalUnread += unreadMessages.length;
+          }
+        }
+      }
+
+      // Atualizar apenas se o valor mudou
+      setUnreadCount(prev => prev !== totalUnread ? totalUnread : prev);
+    } catch (error) {
+      console.warn('Erro ao contar mensagens não lidas:', error);
+      // Manter valor anterior em caso de erro
+    }
+  }, []);
+
   useEffect(() => {
     fetchProducts();
     fetchFeaturedProducts();
@@ -155,6 +195,69 @@ const Products: React.FC = () => {
       return () => categoriesContainer.removeEventListener('wheel', handleWheel);
     }
   }, [searchTerm, selectedCategory]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsLoggedIn(!!user);
+
+      // Carregar contagem de mensagens não lidas de forma não-bloqueante
+      if (user) {
+        fetchUnreadMessages(user.id).catch(() => {
+          // Silenciar erros para não afetar UX
+        });
+      } else {
+        setUnreadCount(0);
+      }
+    };
+
+    checkAuth();
+
+    // @ts-ignore
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session?.user);
+
+      // Atualizar contagem quando usuário faz login/logout
+      if (session?.user) {
+        fetchUnreadMessages(session.user.id).catch(() => {
+          // Silenciar erros
+        });
+      } else {
+        setUnreadCount(0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [fetchUnreadMessages]);
+
+  // Atualização em tempo real das mensagens não lidas
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const updateUnreadCount = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await fetchUnreadMessages(user.id);
+      }
+    };
+
+    // Configurar listener em tempo real para mudanças na tabela chats
+    const channel = supabase
+      .channel('unread-messages-realtime')
+      .on('postgres_changes', {
+        event: '*', // INSERT, UPDATE, DELETE
+        schema: 'public',
+        table: 'chats'
+      }, () => {
+        // Atualizar contagem quando houver qualquer mudança nos chats
+        updateUnreadCount().catch(console.warn);
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [isLoggedIn]);
 
   // Real-time updates for featured products
   useEffect(() => {
@@ -242,6 +345,23 @@ const Products: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <a href={isLoggedIn ? '/messages' : '/login'} className="flex items-center text-black hover:text-[#57da74] transition-colors relative">
+                <div className="relative">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold min-w-[20px]">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              </a>
+              <a href={isLoggedIn ? '/profile' : '/login'} className="flex items-center text-black hover:text-[#57da74] transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </a>
               <button
                 onClick={async () => {
                   const { data: { user } } = await supabase.auth.getUser();

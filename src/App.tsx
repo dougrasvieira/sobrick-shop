@@ -129,7 +129,7 @@ const ConditionalNav = () => {
     };
   }, [isLoggedIn]);
 
-  if (location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname.startsWith('/product-details') || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin' || location.pathname === '/download') return null;
+  if (location.pathname === '/' || location.pathname === '/login' || location.pathname.startsWith('/chat/') || location.pathname.startsWith('/product-details') || location.pathname === '/upload-product' || location.pathname === '/profile' || location.pathname === '/my-sales' || location.pathname === '/interests' || location.pathname === '/messages' || location.pathname === '/register' || location.pathname === '/admin' || location.pathname === '/download') return null;
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
       <div className="flex justify-around items-center py-2">
