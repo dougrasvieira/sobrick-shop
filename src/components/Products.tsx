@@ -1,4 +1,4 @@
-                              import React, { useState, useEffect, useCallback } from 'react';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -13,7 +13,7 @@ interface Product {
   price: number;
   category: string;
   condition: string;
-  location: string;
+  location: string;                 
   images: string[];
   description?: string;
   created_at: string;
@@ -357,34 +357,6 @@ const Products: React.FC = () => {
               </a>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-3 order-2 sm:order-3">
-              <button
-                onClick={async () => {
-                  const { data: { user } } = await supabase.auth.getUser();
-                  if (user) {
-                    navigate('/upload-product');
-                  } else {
-                    navigate('/login');
-                  }
-                }}
-                className="bg-[#57da74] text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg hover:bg-[#4ac863] transition-colors font-medium flex items-center space-x-1 sm:space-x-2 cursor-pointer text-sm sm:text-base"
-              >
-                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <span>Anunciar</span>
-              </button>
-              <a href={isLoggedIn ? '/messages' : '/login'} className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors relative">
-                <div className="relative">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  {unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-bold min-w-[16px] sm:min-w-[20px]">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </div>
-                  )}
-                </div>
-              </a>
               <a href={isLoggedIn ? '/profile' : '/login'} className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -825,6 +797,36 @@ const Products: React.FC = () => {
         )}
       </div>
 
+      {/* Floating Buttons */}
+      <div className="fixed bottom-4 right-4 flex flex-col space-y-2 z-50">
+        <a href={isLoggedIn ? '/messages' : '/login'} className="flex items-center justify-center w-12 h-12 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors shadow-lg relative">
+          <div className="relative">
+            <svg className="w-6 h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {unreadCount > 0 && (
+              <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold min-w-[20px]">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </div>
+            )}
+          </div>
+        </a>
+        <button
+          onClick={async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              navigate('/upload-product');
+            } else {
+              navigate('/login');
+            }
+          }}
+          className="flex items-center justify-center w-12 h-12 bg-[#57da74] text-black rounded-full hover:bg-[#4ac863] transition-colors shadow-lg"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        </button>
+      </div>
 
     </div>
   );
