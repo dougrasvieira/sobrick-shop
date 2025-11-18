@@ -72,27 +72,16 @@ const Login: React.FC = () => {
       <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0.5">
           <div className="flex items-center justify-center">
-            <div className="inline-flex items-center space-x-0 mb-1 rounded-lg px-0.5 py-0.5">
-              <img src="/logotipo.png" alt="Logo SóBrick" className="h-12 w-auto" />
-              <div className="flex flex-col items-center -mt-1">
-                <h1 className="text-2xl font-black text-gray-900" translate="no">
-                  <span className="text-[#57da74]" style={{ WebkitTextStroke: '1px black' }}>Só</span><span className="text-black">Brick</span>
-                </h1>
-                <p className="text-white text-xs font-light italic -mt-1" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
-              </div>
-            </div>
-            <div className="flex items-center ml-4">
-              <a
-                href="/download"
-                className="flex items-center space-x-2 bg-black border border-[#57da74] rounded-full px-3 py-1.5 hover:bg-gray-800 transition-colors"
-                style={{ boxShadow: '0 0 10px rgba(87, 218, 116, 0.5)' }}
-              >
-                <svg className="w-5 h-5 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span className="text-white text-sm font-medium">Download APP</span>
-              </a>
-            </div>
+            <a
+              href="/download"
+              className="flex items-center space-x-2 bg-black border border-[#57da74] rounded-full px-3 py-1.5 hover:bg-gray-800 transition-colors"
+              style={{ boxShadow: '0 0 10px rgba(87, 218, 116, 0.5)' }}
+            >
+              <svg className="w-5 h-5 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span className="text-white text-sm font-medium">Download APP</span>
+            </a>
           </div>
         </div>
       </header>
