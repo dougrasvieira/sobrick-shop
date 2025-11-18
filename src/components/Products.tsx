@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+                              import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -333,30 +333,30 @@ const Products: React.FC = () => {
     <div className="min-h-screen bg-white pb-20" style={{ fontFamily: '"Outfit", sans-serif' }}>
       {/* Header */}
       <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0.5">
-          <div className="flex items-center justify-between">
-            <div className="inline-flex items-center space-x-0 mb-1 rounded-lg px-0.5 py-0.5">
-              <img src="/logotipo.png" alt="Logo SóBrick" className="h-12 w-auto cursor-pointer" style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))' }} onClick={() => window.location.reload()} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-0.5">
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
+            <div className="inline-flex items-center space-x-0 mb-1 rounded-lg px-0.5 py-0.5 order-1 sm:order-1">
+              <img src="/logotipo.png" alt="Logo SóBrick" className="h-8 sm:h-12 w-auto cursor-pointer" style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))' }} onClick={() => window.location.reload()} />
               <div className="flex flex-col items-center -mt-1">
-                <h1 className="text-2xl font-black text-gray-900" translate="no">
+                <h1 className="text-lg sm:text-2xl font-black text-gray-900" translate="no">
                   <span className="text-[#57da74]" style={{ WebkitTextStroke: '1px black' }}>Só</span><span className="text-black">Brick</span>
                 </h1>
-                <p className="text-white text-xs font-light italic -mt-1" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
+                <p className="text-white text-xs font-light italic -mt-1 hidden sm:block" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center order-3 sm:order-2">
               <a
                 href="/download"
-                className="flex items-center space-x-2 bg-black border border-[#57da74] rounded-full px-3 py-1.5 hover:bg-gray-800 transition-colors"
+                className="flex items-center space-x-1 sm:space-x-2 bg-black border border-[#57da74] rounded-full px-2 sm:px-3 py-1 sm:py-1.5 hover:bg-gray-800 transition-colors"
                 style={{ boxShadow: '0 0 10px rgba(87, 218, 116, 0.5)' }}
               >
-                <svg className="w-5 h-5 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span className="text-white text-sm font-medium">Download APP</span>
+                <span className="text-white text-xs sm:text-sm font-medium">Download APP</span>
               </a>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 order-2 sm:order-3">
               <button
                 onClick={async () => {
                   const { data: { user } } = await supabase.auth.getUser();
@@ -366,27 +366,27 @@ const Products: React.FC = () => {
                     navigate('/login');
                   }
                 }}
-                className="bg-[#57da74] text-black px-3 py-1.5 rounded-lg hover:bg-[#4ac863] transition-colors font-medium flex items-center space-x-2 cursor-pointer"
+                className="bg-[#57da74] text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg hover:bg-[#4ac863] transition-colors font-medium flex items-center space-x-1 sm:space-x-2 cursor-pointer text-sm sm:text-base"
               >
-                <svg className="h-5 w-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
                 <span>Anunciar</span>
               </button>
-              <a href={isLoggedIn ? '/messages' : '/login'} className="flex items-center justify-center w-10 h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors relative">
+              <a href={isLoggedIn ? '/messages' : '/login'} className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors relative">
                 <div className="relative">
-                  <svg className="w-6 h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   {unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold min-w-[20px]">
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-bold min-w-[16px] sm:min-w-[20px]">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </div>
                   )}
                 </div>
               </a>
-              <a href={isLoggedIn ? '/profile' : '/login'} className="flex items-center justify-center w-10 h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors">
-                <svg className="w-6 h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href={isLoggedIn ? '/profile' : '/login'} className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </a>
