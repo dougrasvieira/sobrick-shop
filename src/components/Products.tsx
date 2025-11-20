@@ -1,10 +1,9 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
-import 'swiper/css/pagination';
 import { supabase } from '../supabaseClient';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -430,12 +429,7 @@ const Products: React.FC = () => {
               delay: 5000,
               disableOnInteraction: false,
             }}
-            pagination={{
-              clickable: true,
-              bulletClass: 'custom-bullet',
-              bulletActiveClass: 'custom-bullet-active',
-            }}
-            modules={[Autoplay, Pagination]}
+            modules={[Autoplay]}
             className="mySwiper"
             breakpoints={{
               1200: {
@@ -483,31 +477,6 @@ const Products: React.FC = () => {
               </SwiperSlide>
             ))}
           </Swiper>
-          <style>{`
-            .swiper-pagination {
-              bottom: 15px !important;
-            }
-            .custom-bullet {
-              background: #57da74 !important;
-              opacity: 0.5 !important;
-              width: 8px !important;
-              height: 8px !important;
-              margin: 0 4px !important;
-              border-radius: 50% !important;
-              transition: opacity 0.3s !important;
-            }
-            .custom-bullet:hover {
-              opacity: 1 !important;
-            }
-            .custom-bullet-active {
-              background: #57da74 !important;
-              opacity: 1 !important;
-              width: 8px !important;
-              height: 8px !important;
-              margin: 0 4px !important;
-              border-radius: 50% !important;
-            }
-          `}</style>
           </div>
         </div>
 
