@@ -44,8 +44,8 @@ const Products: React.FC = () => {
   // Estado para produtos em destaque (carregados do banco)
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
 
-  // Estado para progresso da barra de paginação
-  const [progress, setProgress] = useState(100);
+  // Estado para progresso da barra de paginação (usado internamente pelo Swiper)
+  const [, setProgress] = useState(100);
 
   // Estados para navegação no header
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -437,7 +437,7 @@ const Products: React.FC = () => {
             }}
             modules={[Autoplay, Pagination]}
             className="mySwiper"
-            onAutoplayTimeLeft={(swiper, timeLeft, progress) => {
+            onAutoplayTimeLeft={(_, __, progress) => {
               setProgress(progress * 100);
             }}
             breakpoints={{
