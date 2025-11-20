@@ -432,8 +432,8 @@ const Products: React.FC = () => {
             }}
             pagination={{
               clickable: true,
-              bulletClass: 'swiper-pagination-bullet !bg-[#57da74] !opacity-50 hover:!opacity-100 !w-2 !h-2',
-              bulletActiveClass: 'swiper-pagination-bullet-active !bg-[#57da74] !opacity-100 !w-2 !h-2',
+              bulletClass: 'custom-bullet',
+              bulletActiveClass: 'custom-bullet-active',
             }}
             modules={[Autoplay, Pagination]}
             className="mySwiper"
@@ -486,6 +486,26 @@ const Products: React.FC = () => {
           <style>{`
             .swiper-pagination {
               bottom: 15px !important;
+            }
+            .custom-bullet {
+              background: #57da74 !important;
+              opacity: 0.5 !important;
+              width: 8px !important;
+              height: 8px !important;
+              margin: 0 4px !important;
+              border-radius: 50% !important;
+              transition: opacity 0.3s !important;
+            }
+            .custom-bullet:hover {
+              opacity: 1 !important;
+            }
+            .custom-bullet-active {
+              background: #57da74 !important;
+              opacity: 1 !important;
+              width: 8px !important;
+              height: 8px !important;
+              margin: 0 4px !important;
+              border-radius: 50% !important;
             }
           `}</style>
           </div>
