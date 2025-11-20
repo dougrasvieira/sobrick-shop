@@ -425,7 +425,7 @@ const Products: React.FC = () => {
       {/* Featured Product Swiper */}
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          {featuredLoading && featuredProducts.length > 0 ? (
+          {featuredLoading ? (
             <div className="grid grid-cols-3 gap-4">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div key={index} className="relative border border-white rounded-2xl overflow-hidden animate-pulse">
@@ -793,7 +793,7 @@ const Products: React.FC = () => {
 
       {/* Products Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {loading ? (
+        {loading && products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden h-72 relative animate-pulse">
