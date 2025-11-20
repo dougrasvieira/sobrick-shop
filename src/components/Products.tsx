@@ -488,16 +488,18 @@ const Products: React.FC = () => {
           </Swiper>
           <style>{`
             .swiper-pagination-progressbar {
-              background: rgba(255, 255, 255, 0.3);
-              height: 3px;
+              background: rgba(255, 255, 255, 0.2);
+              height: 2px;
               position: absolute;
-              bottom: 0;
-              left: 0;
-              right: 0;
+              bottom: 10px;
+              left: 10px;
+              right: 10px;
+              border-radius: 1px;
             }
             .swiper-pagination-progressbar-fill {
               background: #57da74;
               height: 100%;
+              border-radius: 1px;
             }
           `}</style>
           </div>
