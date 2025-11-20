@@ -455,8 +455,8 @@ const Products: React.FC = () => {
               }}
               pagination={{
                 clickable: true,
-                bulletClass: 'custom-bullet',
-                bulletActiveClass: 'custom-bullet-active',
+                bulletClass: 'bg-[#57da74] opacity-50 w-2 h-2 rounded-full mx-1 transition-opacity duration-300 hover:opacity-100',
+                bulletActiveClass: 'bg-[#57da74] opacity-100',
               }}
               modules={[Autoplay, Pagination]}
               className="mySwiper"
