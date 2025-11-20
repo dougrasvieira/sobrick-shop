@@ -44,8 +44,6 @@ const Products: React.FC = () => {
   // Estado para produtos em destaque (carregados do banco)
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
 
-  // Estado para progresso da barra de paginação (usado internamente pelo Swiper)
-  const [, setProgress] = useState(100);
 
   // Estados para navegação no header
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -433,13 +431,12 @@ const Products: React.FC = () => {
               disableOnInteraction: false,
             }}
             pagination={{
-              type: 'progressbar',
+              clickable: true,
+              bulletClass: 'swiper-pagination-bullet !bg-white !opacity-70 hover:!opacity-100 !w-2 !h-2',
+              bulletActiveClass: 'swiper-pagination-bullet-active !bg-[#57da74] !opacity-100 !w-2 !h-2',
             }}
             modules={[Autoplay, Pagination]}
             className="mySwiper"
-            onAutoplayTimeLeft={(_, __, progress) => {
-              setProgress(progress * 100);
-            }}
             breakpoints={{
               1200: {
                 slidesPerView: 3,
@@ -486,22 +483,6 @@ const Products: React.FC = () => {
               </SwiperSlide>
             ))}
           </Swiper>
-          <style>{`
-            .swiper-pagination-progressbar {
-              background: rgba(255, 255, 255, 0.2);
-              height: 2px;
-              position: absolute;
-              bottom: 10px;
-              left: 10px;
-              right: 10px;
-              border-radius: 1px;
-            }
-            .swiper-pagination-progressbar-fill {
-              background: #57da74;
-              height: 100%;
-              border-radius: 1px;
-            }
-          `}</style>
           </div>
         </div>
 
@@ -795,9 +776,22 @@ const Products: React.FC = () => {
       {/* Products Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#57da74]"></div>
-            <span className="ml-3 text-gray-600">Carregando produtos...</span>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden h-72 relative animate-pulse">
+                <div className="relative h-48 bg-gray-200"></div>
+                <div className="p-2 flex flex-col justify-between h-28 bg-gray-100">
+                  <div className="flex flex-col gap-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="flex items-center -ml-1">
+                      <div className="w-4 h-4 bg-gray-200 rounded mr-1"></div>
+                      <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
