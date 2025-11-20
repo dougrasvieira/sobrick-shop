@@ -432,7 +432,7 @@ const Products: React.FC = () => {
             }}
             pagination={{
               clickable: true,
-              bulletClass: 'swiper-pagination-bullet !bg-white !opacity-70 hover:!opacity-100 !w-2 !h-2',
+              bulletClass: 'swiper-pagination-bullet !bg-[#57da74] !opacity-50 hover:!opacity-100 !w-2 !h-2',
               bulletActiveClass: 'swiper-pagination-bullet-active !bg-[#57da74] !opacity-100 !w-2 !h-2',
             }}
             modules={[Autoplay, Pagination]}
@@ -483,6 +483,11 @@ const Products: React.FC = () => {
               </SwiperSlide>
             ))}
           </Swiper>
+          <style>{`
+            .swiper-pagination {
+              bottom: 15px !important;
+            }
+          `}</style>
           </div>
         </div>
 
