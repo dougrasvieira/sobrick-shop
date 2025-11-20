@@ -1,10 +1,9 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
-import 'swiper/css/pagination';
 import { supabase } from '../supabaseClient';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -453,12 +452,7 @@ const Products: React.FC = () => {
                 delay: 5000,
                 disableOnInteraction: false,
               }}
-              pagination={{
-                clickable: true,
-                bulletClass: 'bg-[#57da74] opacity-50 w-2 h-2 rounded-full mx-1 transition-opacity duration-300 hover:opacity-100',
-                bulletActiveClass: 'bg-[#57da74] opacity-100',
-              }}
-              modules={[Autoplay, Pagination]}
+              modules={[Autoplay]}
               className="mySwiper"
               breakpoints={{
                 1200: {
