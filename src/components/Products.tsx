@@ -1,9 +1,10 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
+import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
+import 'swiper/css/pagination';
 import { supabase } from '../supabaseClient';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -42,6 +43,9 @@ const Products: React.FC = () => {
 
   // Estado para produtos em destaque (carregados do banco)
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
+
+  // Estado para progresso da barra de paginação
+  const [progress, setProgress] = useState(100);
 
   // Estados para navegação no header
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -428,8 +432,14 @@ const Products: React.FC = () => {
               delay: 5000,
               disableOnInteraction: false,
             }}
-            modules={[Autoplay]}
+            pagination={{
+              type: 'progressbar',
+            }}
+            modules={[Autoplay, Pagination]}
             className="mySwiper"
+            onAutoplayTimeLeft={(swiper, timeLeft, progress) => {
+              setProgress(progress * 100);
+            }}
             breakpoints={{
               1200: {
                 slidesPerView: 3,
@@ -445,7 +455,7 @@ const Products: React.FC = () => {
           >
             {featuredProducts.map((product: FeaturedProduct, index: number) => (
               <SwiperSlide key={product.id}>
-                <div className="relative border border-gray-200 rounded-2xl overflow-hidden">
+                <div className="relative border border-white rounded-2xl overflow-hidden">
                   <img
                     src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/300x200?text=Imagem+não+disponível'}
                     alt={product.title}
@@ -476,6 +486,20 @@ const Products: React.FC = () => {
               </SwiperSlide>
             ))}
           </Swiper>
+          <style>{`
+            .swiper-pagination-progressbar {
+              background: rgba(255, 255, 255, 0.3);
+              height: 3px;
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              right: 0;
+            }
+            .swiper-pagination-progressbar-fill {
+              background: #57da74;
+              height: 100%;
+            }
+          `}</style>
           </div>
         </div>
 
