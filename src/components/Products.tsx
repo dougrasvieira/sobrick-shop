@@ -42,6 +42,7 @@ const Products: React.FC = () => {
 
   // Estado para produtos em destaque (carregados do banco)
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
 
 
   // Estados para navegação no header
@@ -50,6 +51,7 @@ const Products: React.FC = () => {
 
   const fetchFeaturedProducts = useCallback(async () => {
     try {
+      setFeaturedLoading(true);
       // Buscar produtos em destaque com configurações específicas do swiper
       console.log('Tentando buscar produtos em destaque...');
       const { data, error } = await supabase
@@ -142,6 +144,8 @@ const Products: React.FC = () => {
           images: ['https://picsum.photos/300/200?random=1']
         }
       ]);
+    } finally {
+      setFeaturedLoading(false);
     }
   }, []);
 
@@ -421,62 +425,82 @@ const Products: React.FC = () => {
       {/* Featured Product Swiper */}
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Swiper
-            spaceBetween={10}
-            slidesPerView={3}
-            loop={true}
-            autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
-            }}
-            modules={[Autoplay]}
-            className="mySwiper"
-            breakpoints={{
-              1200: {
-                slidesPerView: 3,
-              },
-              768: {
-                slidesPerView: 2,
-              },
-              0: {
-                slidesPerView: 1,
-              },
-            }}
-            style={{ paddingLeft: 0, paddingRight: 0 }}
-          >
-            {featuredProducts.map((product: FeaturedProduct, index: number) => (
-              <SwiperSlide key={product.id}>
-                <div className="relative border border-white rounded-2xl overflow-hidden">
-                  <img
-                    src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/300x200?text=Imagem+não+disponível'}
-                    alt={product.title}
-                    className="w-full h-64 object-cover"
-                  />
+          {featuredLoading ? (
+            <div className="grid grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="relative border border-white rounded-2xl overflow-hidden animate-pulse">
+                  <div className="w-full h-64 bg-gray-200"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                      {product.swiper_main_text && product.swiper_main_text.trim() !== '' ? product.swiper_main_text : ''}
-                    </span>
+                    <div className="h-8 bg-gray-300 rounded w-32"></div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 text-white p-4 rounded-b-lg">
-                    {product.swiper_subtitle && (
-                      <h2 className="text-xl font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                        {product.swiper_subtitle}
-                      </h2>
-                    )}
-                    <p className="text-lg font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-                      {product.swiper_price || `R$ ${product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                    </p>
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="h-6 bg-gray-300 rounded w-24 mb-2"></div>
+                    <div className="h-5 bg-gray-300 rounded w-20"></div>
                   </div>
-                  <button
-                    className="absolute bottom-4 right-4 bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-                    onClick={() => navigate(`/product-details/${index + 1}`)}
-                  >
-                    Eu quero
-                  </button>
+                  <div className="absolute bottom-4 right-4">
+                    <div className="h-8 w-16 bg-gray-300 rounded-full"></div>
+                  </div>
                 </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+              ))}
+            </div>
+          ) : (
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={3}
+              loop={true}
+              autoplay={{
+                delay: 5000,
+                disableOnInteraction: false,
+              }}
+              modules={[Autoplay]}
+              className="mySwiper"
+              breakpoints={{
+                1200: {
+                  slidesPerView: 3,
+                },
+                768: {
+                  slidesPerView: 2,
+                },
+                0: {
+                  slidesPerView: 1,
+                },
+              }}
+              style={{ paddingLeft: 0, paddingRight: 0 }}
+            >
+              {featuredProducts.map((product: FeaturedProduct, index: number) => (
+                <SwiperSlide key={product.id}>
+                  <div className="relative border border-white rounded-2xl overflow-hidden">
+                    <img
+                      src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/300x200?text=Imagem+não+disponível'}
+                      alt={product.title}
+                      className="w-full h-64 object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+                        {product.swiper_main_text && product.swiper_main_text.trim() !== '' ? product.swiper_main_text : ''}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 text-white p-4 rounded-b-lg">
+                      {product.swiper_subtitle && (
+                        <h2 className="text-xl font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+                          {product.swiper_subtitle}
+                        </h2>
+                      )}
+                      <p className="text-lg font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+                        {product.swiper_price || `R$ ${product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      </p>
+                    </div>
+                    <button
+                      className="absolute bottom-4 right-4 bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
+                      onClick={() => navigate(`/product-details/${index + 1}`)}
+                    >
+                      Eu quero
+                    </button>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
           </div>
         </div>
 
