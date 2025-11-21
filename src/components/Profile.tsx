@@ -77,7 +77,7 @@ const Profile: React.FC = () => {
     });
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setShowSettingsModal(false);
     Swal.fire({
       title: 'Alterar Senha',
@@ -110,19 +110,86 @@ const Profile: React.FC = () => {
           return false;
         }
 
-        // Aqui você pode adicionar a lógica para verificar a senha atual e atualizar
-        // Por enquanto, apenas simula o sucesso
         return { currentPassword, newPassword };
       }
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Simulação de sucesso
-        Swal.fire({
-          title: 'Sucesso!',
-          text: 'Senha alterada com sucesso.',
-          icon: 'success',
-          confirmButtonColor: '#57da74'
-        });
+        try {
+          const { currentPassword, newPassword } = result.value;
+
+          // Verificar a senha atual tentando fazer login temporário
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user || !user.email) {
+            Swal.fire('Erro', 'Usuário não encontrado.', 'error');
+            return;
+          }
+
+          // Tentar signInWithPassword com a senha atual para validar
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password: currentPassword,
+          });
+
+          if (signInError) {
+            Swal.fire('Erro', 'Senha atual incorreta.', 'error');
+            return;
+          }
+
+          // Se chegou aqui, senha atual está correta. Agora atualizar para a nova
+          const { error: updateError } = await supabase.auth.updateUser({
+            password: newPassword,
+          });
+
+          if (updateError) {
+            Swal.fire('Erro', 'Não foi possível alterar a senha. Tente novamente.', 'error');
+            return;
+          }
+
+          // Revogar sessões em todos os dispositivos
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+              console.log('Chamando Edge Function para revogar sessões...');
+              const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/revoke-sessions`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${session.access_token}`,
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              const result = await response.json();
+              console.log('Resposta da Edge Function:', result);
+
+              if (!response.ok) {
+                console.warn('Falha ao revogar sessões globais:', result);
+              } else {
+                console.log('Sessões revogadas com sucesso.');
+              }
+            } else {
+              console.warn('Nenhuma sessão ativa encontrada para revogar.');
+            }
+          } catch (revokeError) {
+            console.error('Erro ao chamar Edge Function:', revokeError);
+          }
+
+          // Forçar logout para invalidar a sessão atual
+          await supabase.auth.signOut();
+
+          Swal.fire({
+            title: 'Sucesso!',
+            text: 'Senha alterada com sucesso. Você será desconectado e precisará logar novamente com a nova senha.',
+            icon: 'success',
+            confirmButtonColor: '#57da74'
+          }).then(() => {
+            // Redirecionar para login
+            navigate('/login');
+          });
+
+        } catch (error) {
+          console.error('Erro ao alterar senha:', error);
+          Swal.fire('Erro', 'Ocorreu um erro inesperado. Tente novamente.', 'error');
+        }
       }
     });
   };
