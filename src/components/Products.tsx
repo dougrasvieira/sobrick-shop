@@ -341,18 +341,24 @@ const Products: React.FC = () => {
         {/* Enfeites Natalinos - Ativados apenas em dezembro */}
         {true && ( // Temporariamente ativado para teste
           <>
-            {/* Texto "Feliz Natal" com fonte natalina */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
-              <span
-                className="text-white text-lg sm:text-2xl font-bold opacity-80 animate-pulse"
-                style={{
-                  fontFamily: '"Dancing Script", cursive', // Fonte natalina
-                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
-                  animationDuration: '3s',
-                }}
-              >
-                Feliz Natal 🎄
-              </span>
+            {/* Estrelas realistas piscando no fundo */}
+            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+              {Array.from({ length: 15 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute text-yellow-200 text-sm sm:text-lg animate-pulse"
+                  style={{
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    animationDuration: `${2 + Math.random() * 2}s`,
+                    opacity: 0.6 + Math.random() * 0.4, // Opacidade variável para realismo
+                    filter: 'drop-shadow(0 0 2px rgba(255, 255, 0, 0.8))', // Brilho
+                  }}
+                >
+                  ⭐
+                </div>
+              ))}
             </div>
             {/* Luzes de Natal ao longo do topo - responsivas */}
             <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true">
@@ -378,6 +384,7 @@ const Products: React.FC = () => {
                 <h1 className="text-lg sm:text-2xl font-black text-gray-900" translate="no">
                   <span className="text-[#57da74]" style={{ WebkitTextStroke: '1px black' }}>Só</span><span className="text-black">Brick</span>
                 </h1>
+                <p className="text-white text-xs font-light italic -mt-1 hidden sm:block" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
               </div>
             </div>
             <div className="flex items-center">
