@@ -338,12 +338,9 @@ const Products: React.FC = () => {
     <div className="min-h-screen bg-white pb-20" style={{ fontFamily: '"Outfit", sans-serif' }}>
       {/* Header */}
       <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm relative overflow-hidden">
-        {/* Enfeites Natalinos Modernos - Ativados apenas em dezembro */}
+        {/* Enfeites Natalinos - Ativados apenas em dezembro */}
         {true && ( // Temporariamente ativado para teste
           <>
-            {/* Gradiente dinâmico sutil */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-white/5 animate-pulse pointer-events-none" aria-hidden="true" />
-
             {/* Estrelas realistas piscando no fundo */}
             <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
               {Array.from({ length: 15 }).map((_, i) => (
@@ -363,23 +360,8 @@ const Products: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            {/* Linhas de luz geométricas modernas */}
+            {/* Luzes de Natal ao longo do topo - responsivas */}
             <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true">
-              {Array.from({ length: 15 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-6 sm:w-8 h-1 bg-gradient-to-r from-blue-400 via-silver-300 to-cyan-400 rounded-full animate-pulse"
-                  style={{
-                    animationDelay: `${i * 0.15}s`,
-                    animationDuration: '2s',
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Luzes de Natal coloridas ao longo do topo */}
-            <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true" style={{ top: '4px' }}>
               {Array.from({ length: 20 }).map((_, i) => (
                 <div
                   key={i}
@@ -390,27 +372,6 @@ const Products: React.FC = () => {
                   }}
                 />
               ))}
-            </div>
-
-            {/* Forma abstrata moderna (estrela estilizada) */}
-            <div className="absolute bottom-2 right-4 text-white opacity-60 pointer-events-none" aria-hidden="true">
-              <svg width="50" height="50" viewBox="0 0 50 50" className="drop-shadow-lg">
-                <defs>
-                  <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: '#60a5fa', stopOpacity: 1 }} />
-                    <stop offset="50%" style={{ stopColor: '#c7d2fe', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#e0e7ff', stopOpacity: 1 }} />
-                  </linearGradient>
-                </defs>
-                <polygon
-                  points="25,5 28,18 42,18 31,26 35,40 25,32 15,40 19,26 8,18 22,18"
-                  fill="url(#starGradient)"
-                  stroke="#ffffff"
-                  strokeWidth="1"
-                  className="animate-pulse"
-                  style={{ animationDuration: '3s' }}
-                />
-              </svg>
             </div>
           </>
         )}
