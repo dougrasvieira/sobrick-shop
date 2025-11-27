@@ -373,7 +373,7 @@ const Products: React.FC = () => {
               ))}
             </div>
             {/* Ícone de árvore no canto direito */}
-            <div className="absolute top-2 right-2 text-white text-2xl opacity-70 pointer-events-none" aria-hidden="true">
+            <div className="absolute top-2 right-2 text-white text-4xl opacity-70 pointer-events-none" aria-hidden="true">
               🎄
             </div>
           </>
