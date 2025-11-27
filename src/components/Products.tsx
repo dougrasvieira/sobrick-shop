@@ -341,23 +341,18 @@ const Products: React.FC = () => {
         {/* Enfeites Natalinos - Ativados apenas em dezembro */}
         {true && ( // Temporariamente ativado para teste
           <>
-            {/* Estrelas piscando no fundo - responsivas */}
-            <div className="absolute inset-0 pointer-events-none">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute text-yellow-300 text-sm sm:text-lg animate-pulse"
-                  style={{
-                    top: `${Math.random() * 100}%`,
-                    left: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    animationDuration: '2s',
-                  }}
-                  aria-hidden="true"
-                >
-                  ⭐
-                </div>
-              ))}
+            {/* Texto "Feliz Natal" com fonte natalina */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+              <span
+                className="text-white text-lg sm:text-2xl font-bold opacity-80 animate-pulse"
+                style={{
+                  fontFamily: '"Dancing Script", cursive', // Fonte natalina
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+                  animationDuration: '3s',
+                }}
+              >
+                Feliz Natal 🎄
+              </span>
             </div>
             {/* Luzes de Natal ao longo do topo - responsivas */}
             <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true">
