@@ -363,12 +363,9 @@ const Products: React.FC = () => {
               🎄
             </div>
 
-            {/* Doces em formato de boneco (gingerbread) */}
-            <div className="absolute bottom-2 left-1/4 text-amber-700 text-sm sm:text-base opacity-70 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3s' }}>
-              🍪
-            </div>
-            <div className="absolute bottom-2 right-1/4 text-amber-700 text-sm sm:text-base opacity-70 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>
-              🍪
+            {/* Frase "Feliz Natal" */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white text-sm sm:text-lg font-bold opacity-80 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3s', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
+              Feliz Natal 🎄
             </div>
           </>
         )}
