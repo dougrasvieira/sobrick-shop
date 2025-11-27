@@ -339,7 +339,7 @@ const Products: React.FC = () => {
       {/* Header */}
       <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm relative overflow-hidden">
         {/* Enfeites Natalinos - Ativados apenas em dezembro */}
-        {new Date().getMonth() === 11 && (
+        {true && ( // Temporariamente ativado para teste
           <>
             {/* Estrelas piscando no fundo */}
             <div className="absolute inset-0 pointer-events-none">
