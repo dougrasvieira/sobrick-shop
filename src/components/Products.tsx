@@ -341,12 +341,12 @@ const Products: React.FC = () => {
         {/* Enfeites Natalinos - Ativados apenas em dezembro */}
         {true && ( // Temporariamente ativado para teste
           <>
-            {/* Estrelas piscando no fundo */}
+            {/* Estrelas piscando no fundo - responsivas */}
             <div className="absolute inset-0 pointer-events-none">
-              {Array.from({ length: 10 }).map((_, i) => (
+              {Array.from({ length: 12 }).map((_, i) => (
                 <div
                   key={i}
-                  className="absolute text-yellow-300 text-lg animate-pulse"
+                  className="absolute text-yellow-300 text-sm sm:text-lg animate-pulse"
                   style={{
                     top: `${Math.random() * 100}%`,
                     left: `${Math.random() * 100}%`,
@@ -359,22 +359,18 @@ const Products: React.FC = () => {
                 </div>
               ))}
             </div>
-            {/* Luzes de Natal ao longo do topo */}
+            {/* Luzes de Natal ao longo do topo - responsivas */}
             <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true">
               {Array.from({ length: 20 }).map((_, i) => (
                 <div
                   key={i}
-                  className="w-2 h-2 rounded-full animate-ping"
+                  className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-ping"
                   style={{
                     backgroundColor: ['#ff0000', '#00ff00', '#ffff00', '#ff00ff'][i % 4],
                     animationDelay: `${i * 0.1}s`,
                   }}
                 />
               ))}
-            </div>
-            {/* Ícone de árvore no canto direito */}
-            <div className="absolute top-2 right-2 text-white text-4xl opacity-70 pointer-events-none" aria-hidden="true">
-              🎄
             </div>
           </>
         )}
