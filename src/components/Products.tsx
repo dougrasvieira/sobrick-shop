@@ -354,6 +354,22 @@ const Products: React.FC = () => {
                 />
               ))}
             </div>
+
+            {/* Árvores natalinas modernas */}
+            <div className="absolute bottom-1 left-4 text-green-600 text-lg sm:text-xl opacity-80 pointer-events-none animate-bounce" aria-hidden="true" style={{ animationDuration: '4s' }}>
+              🎄
+            </div>
+            <div className="absolute bottom-1 right-4 text-green-600 text-lg sm:text-xl opacity-80 pointer-events-none animate-bounce" aria-hidden="true" style={{ animationDuration: '5s', animationDelay: '1s' }}>
+              🎄
+            </div>
+
+            {/* Doces em formato de boneco (gingerbread) */}
+            <div className="absolute bottom-2 left-1/4 text-amber-700 text-sm sm:text-base opacity-70 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3s' }}>
+              🍪
+            </div>
+            <div className="absolute bottom-2 right-1/4 text-amber-700 text-sm sm:text-base opacity-70 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>
+              🍪
+            </div>
           </>
         )}
 
