@@ -363,10 +363,6 @@ const Products: React.FC = () => {
               🎄
             </div>
 
-            {/* Frase "Feliz Natal" */}
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white text-sm sm:text-lg font-bold opacity-80 pointer-events-none animate-pulse" aria-hidden="true" style={{ animationDuration: '3s', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
-              Feliz Natal 🎄
-            </div>
           </>
         )}
 
@@ -410,6 +406,12 @@ const Products: React.FC = () => {
                 </svg>
                 <span>Anunciar</span>
               </button>
+              {/* Frase "Feliz Natal" ao lado do botão Anunciar */}
+              {true && (
+                <span className="hidden sm:inline text-white text-sm font-bold opacity-80 animate-pulse" style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)', animationDuration: '3s' }}>
+                  Feliz Natal 🎄
+                </span>
+              )}
               <a href={isLoggedIn ? '/messages' : '/login'} className="hidden sm:flex items-center justify-center w-10 h-10 bg-black border border-[#57da74] rounded-full hover:bg-gray-800 transition-colors relative">
                 <div className="relative">
                   <svg className="w-6 h-6 text-[#57da74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
