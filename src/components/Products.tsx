@@ -337,8 +337,49 @@ const Products: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pb-20" style={{ fontFamily: '"Outfit", sans-serif' }}>
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-0.5">
+      <header className="bg-gradient-to-r from-[#57da74] to-black shadow-sm relative overflow-hidden">
+        {/* Enfeites Natalinos - Ativados apenas em dezembro */}
+        {new Date().getMonth() === 11 && (
+          <>
+            {/* Estrelas piscando no fundo */}
+            <div className="absolute inset-0 pointer-events-none">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute text-yellow-300 text-lg animate-pulse"
+                  style={{
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 2}s`,
+                    animationDuration: '2s',
+                  }}
+                  aria-hidden="true"
+                >
+                  ⭐
+                </div>
+              ))}
+            </div>
+            {/* Luzes de Natal ao longo do topo */}
+            <div className="absolute top-0 left-0 right-0 h-1 flex justify-around pointer-events-none" aria-hidden="true">
+              {Array.from({ length: 20 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 rounded-full animate-ping"
+                  style={{
+                    backgroundColor: ['#ff0000', '#00ff00', '#ffff00', '#ff00ff'][i % 4],
+                    animationDelay: `${i * 0.1}s`,
+                  }}
+                />
+              ))}
+            </div>
+            {/* Ícone de árvore no canto direito */}
+            <div className="absolute top-2 right-2 text-white text-2xl opacity-70 pointer-events-none" aria-hidden="true">
+              🎄
+            </div>
+          </>
+        )}
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-0.5 relative z-10">
           <div className="flex items-center justify-between">
             <div className="inline-flex items-center space-x-0 mb-1 rounded-lg px-0.5 py-0.5">
               <img src="/logotipo.png" alt="Logo SóBrick" className="h-8 sm:h-12 w-auto cursor-pointer" style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))' }} onClick={() => window.location.reload()} />
