@@ -378,7 +378,6 @@ const Products: React.FC = () => {
                 <h1 className="text-lg sm:text-2xl font-black text-gray-900" translate="no">
                   <span className="text-[#57da74]" style={{ WebkitTextStroke: '1px black' }}>Só</span><span className="text-black">Brick</span>
                 </h1>
-                <p className="text-white text-xs font-light italic -mt-1 hidden sm:block" style={{ fontFamily: '"Playfair Display", serif', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Um bom negócio</p>
               </div>
             </div>
             <div className="flex items-center">
