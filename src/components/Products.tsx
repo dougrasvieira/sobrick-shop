@@ -44,6 +44,9 @@ const Products: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
 
+  // Estado para controlar carregamento das imagens individuais
+  const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
+
 
   // Estados para navegação no header
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -504,10 +507,21 @@ const Products: React.FC = () => {
               {featuredProducts.map((product: FeaturedProduct, index: number) => (
                 <SwiperSlide key={product.id}>
                   <div className="relative border border-white rounded-2xl overflow-hidden">
+                    {!imagesLoaded[product.id] && (
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse flex flex-col">
+                        <div className="flex-1 bg-gray-300"></div>
+                        <div className="p-4">
+                          <div className="h-6 bg-gray-300 rounded w-24 mb-2"></div>
+                          <div className="h-5 bg-gray-300 rounded w-20"></div>
+                        </div>
+                      </div>
+                    )}
                     <img
                       src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/300x200?text=Imagem+não+disponível'}
                       alt={product.title}
                       className="w-full h-64 object-cover"
+                      onLoad={() => setImagesLoaded(prev => ({ ...prev, [product.id]: true }))}
+                      onError={() => setImagesLoaded(prev => ({ ...prev, [product.id]: true }))}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
